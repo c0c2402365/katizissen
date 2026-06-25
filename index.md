@@ -42,6 +42,49 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
 * 各ブースやサテライト会場を巡ってスタンプを集めると、町田のすてきな景品がもらえるスタンプラリーを実施！
 
 ---
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Map Pin Example</title>
+    <style>
+        /* マップを表示する要素のサイズを指定 */
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Googleマップの表示テスト</h3>
+    <!-- マップが挿入されるコンテナ -->
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            // 目的地の緯度・経度を設定（例：東京タワー）
+            const destination = { lat: 35.6586, lng: 139.7454 };
+
+            // マップオブジェクトの作成
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,          // ズームレベル
+                center: destination, // 中心座標
+            });
+
+            // ピン（マーカー）の設置
+            const marker = new google.maps.Marker({
+                position: destination,
+                map: map,
+                title: "目的地: 東京タワー" // ホバー時に表示されるテキスト
+            });
+        }
+    </script>
+
+    <!-- Google Maps API の読み込み（callbackでinitMap関数を呼び出す） -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+</body>
+</html>
 
 ## 🗺️ アクセス
 
