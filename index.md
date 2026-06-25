@@ -42,50 +42,6 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
 * 各ブースやサテライト会場を巡ってスタンプを集めると、町田のすてきな景品がもらえるスタンプラリーを実施！
 
 ---
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Google Map Pin Example</title>
-    <style>
-        /* マップを表示する要素のサイズを指定 */
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
-</head>
-<body>
-
-    <h3>Googleマップの表示テスト</h3>
-    <!-- マップが挿入されるコンテナ -->
-    <div id="map"></div>
-
-    <script>
-        function initMap() {
-            // 目的地の緯度・経度を設定（例：東京タワー）
-            const destination = { lat: 35.6586, lng: 139.7454 };
-
-            // マップオブジェクトの作成
-            const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 15,          // ズームレベル
-                center: destination, // 中心座標
-            });
-
-            // ピン（マーカー）の設置
-            const marker = new google.maps.Marker({
-                position: destination,
-                map: map,
-                title: "目的地: 東京タワー" // ホバー時に表示されるテキスト
-            });
-        }
-    </script>
-
-    <!-- Google Maps API の読み込み（callbackでinitMap関数を呼び出す） -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
-</body>
-</html>
-
 ## 🗺️ アクセス
 
 ### メイン会場：町田市役所本庁舎
@@ -95,6 +51,68 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
 > ※イベント当日は混雑が予想されます。公共交通機関でのご来場にご協力をお願いいたします。
 
 ---
+## 🗺️ 会場フロアマップ
+
+<div class="floor-map-container">
+  <div class="tab-buttons" style="margin-bottom: 15px;">
+    <button class="tab-btn active" onclick="switchFloor('floor1')">1階 (1F)</button>
+    <button class="tab-btn" onclick="switchFloor('floor2')">2階 (2F)</button>
+    <button class="tab-btn" onclick="switchFloor('floor3')">3階 (3F)</button>
+  </div>
+
+  <div id="floor1" class="tab-content" style="display: block;">
+    <img src="1F.jpeg" alt="1階 フロアマップ" style="width: 100%; max-width: 600px; border: 1px solid #ddd; border-radius: 6px;">
+  </div>
+  
+  <div id="floor2" class="tab-content" style="display: none;">
+    <img src="2F_floor1.jpg" alt="2階 フロアマップ" style="width: 100%; max-width: 600px; border: 1px solid #ddd; border-radius: 6px;">
+  </div>
+  
+  <div id="floor3" class="tab-content" style="display: none;">
+    <img src="FloorMAP3F.jpg" alt="3階 フロアマップ" style="width: 100%; max-width: 600px; border: 1px solid #ddd; border-radius: 6px;">
+  </div>
+</div>
+
+<style>
+  .tab-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 5px;
+    transition: 0.2s;
+  }
+  .tab-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    font-weight: bold;
+  }
+  .tab-btn:hover {
+    opacity: 0.8;
+  }
+</style>
+
+<script>
+  function switchFloor(floorId) {
+    // すべてのコンテンツを非表示にする
+    var contents = document.getElementsByClassName('tab-content');
+    for (var i = 0; i < contents.length; i++) {
+      contents[i].style.display = 'none';
+    }
+    // すべてのボタンの「active」クラスを消す
+    var buttons = document.getElementsByClassName('tab-btn');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove('active');
+    }
+    
+    // 選択された階数だけを表示してボタンを青くする
+    document.getElementById(floorId).style.display = 'block';
+    event.currentTarget.classList.add('active');
+  }
+</script>
 
 ## 🙋 よくある質問（FAQ）
 
