@@ -41,39 +41,64 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
 
 {% include_relative events.md %}
 
-## 🗺️ まちカフェ！会場マップ＆ピンナビゲーション
+## 🗺️ 会場案内・フロアマップナビゲーション
 
-<p>見たいフロアのボタンを押すと、市庁舎マップ内の対象エリアにピンが立ちます！</p>
+<p>見たいエリア・階数のボタンを押すと、広域地図のピン位置と、市役所の詳細フロアマップ画像が同時に切り替わります！</p>
 
-<div class="map-controls" style="margin-bottom: 15px;">
-  <button class="floor-btn active" onclick="showFloorPins('all')">全エリア</button>
-  <button class="floor-btn" onclick="showFloorPins('1f_out')">1F 屋外マルシェ・広場</button>
-  <button class="floor-btn" onclick="showFloorPins('1f_in')">1F 屋内（みんなの広場等）</button>
-  <button class="floor-btn" onclick="showFloorPins('2f')">2F 会議室・おうえんルーム</button>
-  <button class="floor-btn" onclick="showFloorPins('3f')">3F 会議室・アトリウム</button>
-  <button class="floor-btn" onclick="showFloorPins('hall')">市民ホール</button>
+<div class="map-controls" style="margin-bottom: 20px;">
+  <button class="floor-btn active" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
+  <button class="floor-btn" onclick="switchFloorMap('1f_out', 'all_img')">1F 屋外マルシェ・広場</button>
+  <button class="floor-btn" onclick="switchFloorMap('1f_in', 'floor1_img')">1F 屋内（ワンストップロビー・みんなの広場）</button>
+  <button class="floor-btn" onclick="switchFloorMap('2f', 'floor2_img')">2F 会議室・おうえんルーム・キッズスペース</button>
+  <button class="floor-btn" onclick="switchFloorMap('3f', 'floor3_img')">3F 会議室・アトリウム・議場</button>
+  <button class="floor-btn" onclick="switchFloorMap('hall', 'all_img')">市民ホール</button>
 </div>
 
-<div id="event-map" style="width: 100%; height: 450px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
+<div class="map-flex-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+  
+  <div class="map-block" style="flex: 1; min-width: 320px;">
+    <h3 style="margin-top: 0;">📍 アクセスマップ</h3>
+    <div id="event-map" style="width: 100%; height: 400px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
+  </div>
+
+  <div class="image-block" style="flex: 1; min-width: 320px; text-align: center;">
+    <h3 style="margin-top: 0; text-align: left;">🏢 庁舎内レイアウト</h3>
+    
+    <div id="all_img" class="floor-img-content" style="display: block; padding: 40px 20px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 8px;">
+      <p style="color: #666; margin: 0;">上のボタンから「1F屋内」「2F」「3F」を選択すると、<br>ここに詳細なフロアマップ画像が表示されます。</p>
+    </div>
+
+    <div id="floor1_img" class="floor-img-content" style="display: none;">
+      <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; max-width: 450px; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    </div>
+    
+    <div id="floor2_img" class="floor-img-content" style="display: none;">
+      <img src="2F_floor1.jpg" alt="町田市役所 2階フロアマップ" style="width: 100%; max-width: 450px; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    </div>
+    
+    <div id="floor3_img" class="floor-img-content" style="display: none;">
+      <img src="FloorMAP3F.jpg" alt="町田市役所 3階フロアマップ" style="width: 100%; max-width: 450px; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    </div>
+  </div>
+
+</div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // 町田市役所の位置を中心に設定
   const defaultCoords = [35.545199, 139.442838];
   let map;
   let markerGroup;
 
-  // 11月29日のイベントデータから、主要なエリアの座標とピン情報を定義
-  // ※微調整してピンが少しずれて重ならないようにしています
+  // 11月29日のイベントエリア定義
   const pinData = [
     { floor: '1f_out', name: '1F 屋外マルシェ（太陽の村、まなクロ等）', coords: [35.54535, 139.44265], desc: '新鮮野菜販売、草木染め、各NPOの物販など多数出展！' },
     { floor: '1f_out', name: '1F 屋外こもれび広場（焼きそば屋台、キッチンカー）', coords: [35.54540, 139.44285], desc: '法政大学焼きそば、リフトカー体験など。' },
     { floor: '1f_in',  name: '1F みんなの広場（認知症相談、リサイクル、相続相談）', coords: [35.54515, 139.44275], desc: '認知症友の会、福祉機器展、無料法律相談など。' },
     { floor: '1f_in',  name: '1F ワンストップロビー（スタンプラリー、工作、体験）', coords: [35.54510, 139.44295], desc: '謎解きスタンプラリー、ボッチャ体験、防災クイズなど盛りだくさん！' },
     { floor: '2f',     name: '2F 市民協働おうえんルーム（助産師相談、サロン、座談会）', coords: [35.54522, 139.44290], desc: '助産師サークル、スマホ相談、脳疲労ケア体験など。' },
-    { floor: '2f',     name: '2F 北側廊下・キッズスペース（駄菓子屋、工作、体験）', coords: [35.54525, 139.44305], desc: 'ミニまちだ駄菓子屋、おしごとなりきり、クリスマスツリー工作。' },
+    { floor: '2f',     name: '2F 北側廊下・キッズスペース（駄菓子屋、工作、体験）', coords: [35.54525, 139.44305], desc: 'ミニまちだ駄菓子屋、おしごなりきり、クリスマスツリー工作。' },
     { floor: '2f',     name: '2F 会議室（2-1〜2-4）（マッサージ、マイクラ、演劇）', coords: [35.54530, 139.44298], desc: '視覚障害者マッサージ、マインクラフトで農体験など。' },
     { floor: '3f',     name: '3F 会議室（3-1〜3-3）（出張科学クラブ、ものづくり）', coords: [35.54505, 139.44270], desc: 'ひなた村科学クラブ（炭酸水、色のマジック※要予約）など。' },
     { floor: '3f',     name: '3F アトリウム（きんじょの本棚、リス園、国際交流）', coords: [35.54498, 139.44285], desc: '革小物ワークショップ、手話体験、町田リス園展示など。' },
@@ -82,30 +107,33 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
   ];
 
   document.addEventListener("DOMContentLoaded", function() {
-    // マップ初期化
     map = L.map('event-map').setView(defaultCoords, 17);
-
-    // 地図タイル（OpenStreetMap）
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
     markerGroup = L.layerGroup().addTo(map);
-
-    // 最初はすべてのピンを表示
     showFloorPins('all');
   });
 
-  function showFloorPins(floorId) {
-    // ボタンの見た目切り替え
+  // 地図のピンと画像を同時にコントロールする関数
+  function switchFloorMap(floorId, imgId) {
+    // 1. ボタンのactiveクラス切り替え
     const buttons = document.getElementsByClassName('floor-btn');
     for (let btn of buttons) { btn.classList.remove('active'); }
     event.currentTarget.classList.add('active');
 
-    // 一度ピンを全部消す
-    markerGroup.clearLayers();
+    // 2. 地図ピンの切り替え
+    showFloorPins(floorId);
 
-    // 該当するエリアのピンだけを打つ
+    // 3. フロアマップ画像の切り替え
+    const imgContents = document.getElementsByClassName('floor-img-content');
+    for (let img of imgContents) { img.style.display = 'none'; }
+    document.getElementById(imgId).style.display = 'block';
+  }
+
+  function showFloorPins(floorId) {
+    markerGroup.clearLayers();
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
@@ -114,7 +142,6 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
       }
     });
 
-    // 市民ホールが選ばれた時だけ少し地図をずらす
     if (floorId === 'hall') {
       map.panTo([35.54394, 139.44111]);
     } else {
@@ -135,7 +162,7 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
     transition: all 0.2s;
   }
   .floor-btn.active {
-    background: #e67e22; /* まちカフェっぽい暖色カラー */
+    background: #e67e22;
     color: white;
     border-color: #e67e22;
     font-weight: bold;
@@ -144,7 +171,6 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
     background: #ddd;
   }
 </style>
-
 ---
 ## 🗺️ アクセス
 
