@@ -41,6 +41,110 @@ description: "町田の市民活動・NPO・企業・行政が集う年に一度
 
 {% include_relative events.md %}
 
+## 🗺️ まちカフェ！会場マップ＆ピンナビゲーション
+
+<p>見たいフロアのボタンを押すと、市庁舎マップ内の対象エリアにピンが立ちます！</p>
+
+<div class="map-controls" style="margin-bottom: 15px;">
+  <button class="floor-btn active" onclick="showFloorPins('all')">全エリア</button>
+  <button class="floor-btn" onclick="showFloorPins('1f_out')">1F 屋外マルシェ・広場</button>
+  <button class="floor-btn" onclick="showFloorPins('1f_in')">1F 屋内（みんなの広場等）</button>
+  <button class="floor-btn" onclick="showFloorPins('2f')">2F 会議室・おうえんルーム</button>
+  <button class="floor-btn" onclick="showFloorPins('3f')">3F 会議室・アトリウム</button>
+  <button class="floor-btn" onclick="showFloorPins('hall')">市民ホール</button>
+</div>
+
+<div id="event-map" style="width: 100%; height: 450px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  // 町田市役所の位置を中心に設定
+  const defaultCoords = [35.545199, 139.442838];
+  let map;
+  let markerGroup;
+
+  // 11月29日のイベントデータから、主要なエリアの座標とピン情報を定義
+  // ※微調整してピンが少しずれて重ならないようにしています
+  const pinData = [
+    { floor: '1f_out', name: '1F 屋外マルシェ（太陽の村、まなクロ等）', coords: [35.54535, 139.44265], desc: '新鮮野菜販売、草木染め、各NPOの物販など多数出展！' },
+    { floor: '1f_out', name: '1F 屋外こもれび広場（焼きそば屋台、キッチンカー）', coords: [35.54540, 139.44285], desc: '法政大学焼きそば、リフトカー体験など。' },
+    { floor: '1f_in',  name: '1F みんなの広場（認知症相談、リサイクル、相続相談）', coords: [35.54515, 139.44275], desc: '認知症友の会、福祉機器展、無料法律相談など。' },
+    { floor: '1f_in',  name: '1F ワンストップロビー（スタンプラリー、工作、体験）', coords: [35.54510, 139.44295], desc: '謎解きスタンプラリー、ボッチャ体験、防災クイズなど盛りだくさん！' },
+    { floor: '2f',     name: '2F 市民協働おうえんルーム（助産師相談、サロン、座談会）', coords: [35.54522, 139.44290], desc: '助産師サークル、スマホ相談、脳疲労ケア体験など。' },
+    { floor: '2f',     name: '2F 北側廊下・キッズスペース（駄菓子屋、工作、体験）', coords: [35.54525, 139.44305], desc: 'ミニまちだ駄菓子屋、おしごとなりきり、クリスマスツリー工作。' },
+    { floor: '2f',     name: '2F 会議室（2-1〜2-4）（マッサージ、マイクラ、演劇）', coords: [35.54530, 139.44298], desc: '視覚障害者マッサージ、マインクラフトで農体験など。' },
+    { floor: '3f',     name: '3F 会議室（3-1〜3-3）（出張科学クラブ、ものづくり）', coords: [35.54505, 139.44270], desc: 'ひなた村科学クラブ（炭酸水、色のマジック※要予約）など。' },
+    { floor: '3f',     name: '3F アトリウム（きんじょの本棚、リス園、国際交流）', coords: [35.54498, 139.44285], desc: '革小物ワークショップ、手話体験、町田リス園展示など。' },
+    { floor: '3f',     name: '3F 議場（いのちの授業、ラテンビッグバンド）', coords: [35.54500, 139.44300], desc: '10:15〜 いのちの授業、13:30〜 マチーダ楽団（要予約）。' },
+    { floor: 'hall',   name: '町田市民ホール（ヨガ、ナリワイ大集合、絵本読み聞かせ）', coords: [35.54394, 139.44111], desc: '市役所から徒歩数分。ヨガ、盆踊り、色彩セラピーなど。' }
+  ];
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // マップ初期化
+    map = L.map('event-map').setView(defaultCoords, 17);
+
+    // 地図タイル（OpenStreetMap）
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    markerGroup = L.layerGroup().addTo(map);
+
+    // 最初はすべてのピンを表示
+    showFloorPins('all');
+  });
+
+  function showFloorPins(floorId) {
+    // ボタンの見た目切り替え
+    const buttons = document.getElementsByClassName('floor-btn');
+    for (let btn of buttons) { btn.classList.remove('active'); }
+    event.currentTarget.classList.add('active');
+
+    // 一度ピンを全部消す
+    markerGroup.clearLayers();
+
+    // 該当するエリアのピンだけを打つ
+    pinData.forEach(function(pin) {
+      if (floorId === 'all' || pin.floor === floorId) {
+        const marker = L.marker(pin.coords);
+        marker.bindPopup(`<b>${pin.name}</b><br><span style="font-size:12px; color:#555;">${pin.desc}</span>`);
+        markerGroup.addLayer(marker);
+      }
+    });
+
+    // 市民ホールが選ばれた時だけ少し地図をずらす
+    if (floorId === 'hall') {
+      map.panTo([35.54394, 139.44111]);
+    } else {
+      map.panTo(defaultCoords);
+    }
+  }
+</script>
+
+<style>
+  .floor-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    background: #f7f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    margin: 3px;
+    transition: all 0.2s;
+  }
+  .floor-btn.active {
+    background: #e67e22; /* まちカフェっぽい暖色カラー */
+    color: white;
+    border-color: #e67e22;
+    font-weight: bold;
+  }
+  .floor-btn:hover {
+    background: #ddd;
+  }
+</style>
+
 ---
 ## 🗺️ アクセス
 
