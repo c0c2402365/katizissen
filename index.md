@@ -28,7 +28,6 @@
         地図のピンからも連動して部屋の位置を確認できます！
       </p>
     </div>
-    
 
     <div id="floor1_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
       <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
@@ -60,17 +59,17 @@
   const defaultCoords = [35.545199, 139.442838];
   let map;
   let markerGroup;
-  let leafletMarkers = {}; // アクセスマップのマーカー参照用
+  let leafletMarkers = {}; 
 
-  // mapPos: { top: '縦位置%', left: '横位置%' } を追加（※位置は実際の画像に合わせて調整してください）
+  // mapPos（画像内の位置％）を実際の部屋の位置に合わせて調整済み
   const pinData = [
     { id: 1, floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54535, 139.44265], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！', mapPos: null },
     { id: 2, floor: '1f_out', img: 'all_img', name: '1F 屋外ここもれび広場', coords: [35.54540, 139.44285], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。', mapPos: null },
     { id: 3, floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54515, 139.44275], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。', mapPos: { top: '75%', left: '70%' } },
     { id: 4, floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54510, 139.44295], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。', mapPos: { top: '45%', left: '50%' } },
-    { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側（201横）】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '65%', left: '40%' } },
-    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階中央〜右側】ミニまちだ駄菓子屋、おしごなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '35%', left: '75%' } },
-    { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '30%', left: '25%' } },
+    { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側（201横）】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '82%', left: '45%' } },
+    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階中央〜右側】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '33%', left: '79%' } },
+    { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '48%', left: '30%' } },
     { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302近辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '20%', left: '30%' } },
     { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '50%', left: '50%' } },
     { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '55%', left: '80%' } },
@@ -85,7 +84,7 @@
 
     markerGroup = L.layerGroup().addTo(map);
     showFloorPins('all');
-    renderImagePins(); // 庁舎内マップへのピン配置初期化
+    renderImagePins();
   });
 
   function switchFloorMap(floorId, imgId) {
@@ -106,7 +105,6 @@
     
     const targetImg = document.getElementById(imgId);
     if (targetImg) {
-      // flexコンテナ崩れ防止のため、画像表示時は inline-block もしくは block にする
       targetImg.style.display = (imgId === 'all_img') ? 'block' : 'inline-block';
     }
   }
@@ -126,7 +124,7 @@
         });
 
         markerGroup.addLayer(marker);
-        leafletMarkers[pin.id] = marker; // IDで参照できるように保存
+        leafletMarkers[pin.id] = marker;
       }
     });
 
@@ -137,9 +135,7 @@
     }
   }
 
-  // 庁舎内画像の上にピンを生成して配置する関数
   function renderImagePins() {
-    // 一度ピンのコンテナを空にする
     document.querySelectorAll('.inner-pins').forEach(el => el.innerHTML = '');
 
     pinData.forEach(function(pin) {
@@ -152,20 +148,16 @@
           pinEl.style.left = pin.mapPos.left;
           pinEl.title = pin.name;
 
-          // 画像上のピンをクリックした時の挙動
           pinEl.addEventListener('click', function() {
-            // 1. 下部の情報パネルに詳細を表示
             document.getElementById('info-title').innerText = pin.name;
             document.getElementById('info-desc').innerText = pin.desc;
             document.getElementById('floor-pin-info').style.display = 'block';
 
-            // 2. アクセスマップ側のピンも連動してポップアップを開く
             if (leafletMarkers[pin.id]) {
               leafletMarkers[pin.id].openPopup();
               map.panTo(pin.coords);
             }
 
-            // 3. 自分自身（クリックされたピン）を強調
             highlightImagePin(pin.id);
           });
 
@@ -175,7 +167,6 @@
     });
   }
 
-  // 特定の画像ピンを強調する関数
   function highlightImagePin(activeId) {
     document.querySelectorAll('.floor-image-pin').forEach(el => {
       el.classList.remove('selected');
@@ -208,7 +199,6 @@
     background: #ddd;
   }
 
-  /* 庁舎内マップ上のピン（丸型のバッジスタイル） */
   .floor-image-pin {
     position: absolute;
     width: 18px;
@@ -217,7 +207,7 @@
     border: 2px solid white;
     border-radius: 50%;
     cursor: pointer;
-    transform: translate(-50%, -50%); /* 中心点を合わせる */
+    transform: translate(-50%, -50%);
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
     transition: transform 0.2s, background-color 0.2s;
     z-index: 10;
@@ -226,7 +216,6 @@
     transform: translate(-50%, -50%) scale(1.3);
     background-color: #e67e22;
   }
-  /* 地図ピンや画像ピンが選択されたときの強調表示 */
   .floor-image-pin.selected {
     background-color: #e67e22;
     transform: translate(-50%, -50%) scale(1.4);
