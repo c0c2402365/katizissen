@@ -1,6 +1,6 @@
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
-<p>見たいエリア・階数のボタンを押すと、アクセスマップのピン位置と、右側の詳細なフロアマップ画像が同時に切り替わります。また、地図上のピンをクリックすると各スペースの出展概要が表示されます。</p>
+<p>見たいエリア・階数のボタンを押すと、アクセスマップのピン位置と、右側の詳細なフロアマップ画像が同時に切り替わります。また、地図上のピンやフロアマップ上のピンをクリックすると各スペースの出展概要が表示されます。</p>
 
 <div class="map-controls" style="margin-bottom: 20px;">
   <button class="floor-btn active" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
@@ -29,19 +29,27 @@
       </p>
     </div>
 
-    <div id="floor1_img" class="floor-img-content" style="display: none;">
-      <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; max-width: 450px; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <div id="floor1_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
+      <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+      <div class="inner-pins"></div>
     </div>
     
-    <div id="floor2_img" class="floor-img-content" style="display: none;">
-      <img src="2F_floor1.jpg" alt="町田市役所 2階フロアマップ" style="width: 100%; max-width: 450px; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <div id="floor2_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
+      <img src="2F_floor1.jpg" alt="町田市役所 2階フロアマップ" style="width: 100%; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+      <div class="inner-pins"></div>
     </div>
     
-    <div id="floor3_img" class="floor-img-content" style="display: none;">
-      <img src="FloorMAP3F.jpg" alt="町田市役所 3階フロアマップ" style="width: 100%; max-width: 450px; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <div id="floor3_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
+      <img src="FloorMAP3F.jpg" alt="町田市役所 3階フロアマップ" style="width: 100%; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+      <div class="inner-pins"></div>
     </div>
   </div>
 
+</div>
+
+<div id="floor-pin-info" style="margin-top: 15px; padding: 10px 15px; background: #fffcf5; border-left: 4px solid #e67e22; border-radius: 4px; display: none;">
+  <strong id="info-title" style="color: #d35400;"></strong>
+  <p id="info-desc" style="margin: 5px 0 0 0; font-size: 13px; color: #333;"></p>
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -51,20 +59,21 @@
   const defaultCoords = [35.545199, 139.442838];
   let map;
   let markerGroup;
+  let leafletMarkers = {}; // アクセスマップのマーカー参照用
 
-  // 各部屋・ブースとフロア画像IDの紐付けデータを追加
+  // mapPos: { top: '縦位置%', left: '横位置%' } を追加（※位置は実際の画像に合わせて調整してください）
   const pinData = [
-    { floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54535, 139.44265], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！' },
-    { floor: '1f_out', img: 'all_img', name: '1F 屋外ここもれび広場', coords: [35.54540, 139.44285], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。' },
-    { floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54515, 139.44275], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。' },
-    { floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54510, 139.44295], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。' },
-    { floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側（201横）】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。' },
-    { floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階中央〜右側】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。' },
-    { floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。' },
-    { floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302近辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。' },
-    { floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。' },
-    { floor: '3f',     img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。' },
-    { floor: 'hall',   img: 'all_img', name: '町田市民ホール（サテライト会場）', coords: [35.54394, 139.44111], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！' }
+    { id: 1, floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54535, 139.44265], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！', mapPos: null },
+    { id: 2, floor: '1f_out', img: 'all_img', name: '1F 屋外ここもれび広場', coords: [35.54540, 139.44285], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。', mapPos: null },
+    { id: 3, floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54515, 139.44275], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。', mapPos: { top: '75%', left: '70%' } },
+    { id: 4, floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54510, 139.44295], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。', mapPos: { top: '45%', left: '50%' } },
+    { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側（201横）】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '65%', left: '40%' } },
+    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階中央〜右側】ミニまちだ駄菓子屋、おしごなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '35%', left: '75%' } },
+    { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '30%', left: '25%' } },
+    { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302近辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '20%', left: '30%' } },
+    { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '50%', left: '50%' } },
+    { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '55%', left: '80%' } },
+    { id: 11, floor: 'hall',  img: 'all_img', name: '町田市民ホール（サテライト会場）', coords: [35.54394, 139.44111], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！', mapPos: null }
   ];
 
   document.addEventListener("DOMContentLoaded", function() {
@@ -75,14 +84,13 @@
 
     markerGroup = L.layerGroup().addTo(map);
     showFloorPins('all');
+    renderImagePins(); // 庁舎内マップへのピン配置初期化
   });
 
-  // ボタンから地図と画像を連動切り替え
   function switchFloorMap(floorId, imgId) {
     const buttons = document.getElementsByClassName('floor-btn');
     for (let btn of buttons) { btn.classList.remove('active'); }
     
-    // スクリプトからの自動呼び出しでない（クリックイベントがある）場合のみactiveを付与
     if(window.event && window.event.currentTarget) {
       window.event.currentTarget.classList.add('active');
     }
@@ -91,26 +99,33 @@
     changeFloorImage(imgId);
   }
 
-  // 画像要素だけを切り替える内部関数
   function changeFloorImage(imgId) {
     const imgContents = document.getElementsByClassName('floor-img-content');
     for (let img of imgContents) { img.style.display = 'none'; }
-    document.getElementById(imgId).style.display = 'block';
+    
+    const targetImg = document.getElementById(imgId);
+    if (targetImg) {
+      // flexコンテナ崩れ防止のため、画像表示時は inline-block もしくは block にする
+      targetImg.style.display = (imgId === 'all_img') ? 'block' : 'inline-block';
+    }
   }
 
   function showFloorPins(floorId) {
     markerGroup.clearLayers();
+    leafletMarkers = {}; 
+
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
         marker.bindPopup(`<b>${pin.name}</b><br><span style="font-size:12px; color:#555;">${pin.desc}</span>`);
         
-        // ピンをクリックした時に、右側のフロアマップ画像も連動して切り替える仕掛け
         marker.on('click', function() {
           changeFloorImage(pin.img);
+          highlightImagePin(pin.id);
         });
 
         markerGroup.addLayer(marker);
+        leafletMarkers[pin.id] = marker; // IDで参照できるように保存
       }
     });
 
@@ -118,6 +133,55 @@
       map.panTo([35.54394, 139.44111]);
     } else {
       map.panTo(defaultCoords);
+    }
+  }
+
+  // 庁舎内画像の上にピンを生成して配置する関数
+  function renderImagePins() {
+    // 一度ピンのコンテナを空にする
+    document.querySelectorAll('.inner-pins').forEach(el => el.innerHTML = '');
+
+    pinData.forEach(function(pin) {
+      if (pin.mapPos) {
+        const container = document.querySelector(`#${pin.img} .inner-pins`);
+        if (container) {
+          const pinEl = document.createElement('div');
+          pinEl.className = `floor-image-pin pin-id-${pin.id}`;
+          pinEl.style.top = pin.mapPos.top;
+          pinEl.style.left = pin.mapPos.left;
+          pinEl.title = pin.name;
+
+          // 画像上のピンをクリックした時の挙動
+          pinEl.addEventListener('click', function() {
+            // 1. 下部の情報パネルに詳細を表示
+            document.getElementById('info-title').innerText = pin.name;
+            document.getElementById('info-desc').innerText = pin.desc;
+            document.getElementById('floor-pin-info').style.display = 'block';
+
+            // 2. アクセスマップ側のピンも連動してポップアップを開く
+            if (leafletMarkers[pin.id]) {
+              leafletMarkers[pin.id].openPopup();
+              map.panTo(pin.coords);
+            }
+
+            // 3. 自分自身（クリックされたピン）を強調
+            highlightImagePin(pin.id);
+          });
+
+          container.appendChild(pinEl);
+        }
+      }
+    });
+  }
+
+  // 特定の画像ピンを強調する関数
+  function highlightImagePin(activeId) {
+    document.querySelectorAll('.floor-image-pin').forEach(el => {
+      el.classList.remove('selected');
+    });
+    const activePin = document.querySelector(`.floor-image-pin.pin-id-${activeId}`);
+    if (activePin) {
+      activePin.classList.add('selected');
     }
   }
 </script>
@@ -142,6 +206,31 @@
   .floor-btn:hover {
     background: #ddd;
   }
+
+  /* 庁舎内マップ上のピン（丸型のバッジスタイル） */
+  .floor-image-pin {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background-color: #ff3b30;
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* 中心点を合わせる */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    transition: transform 0.2s, background-color 0.2s;
+    z-index: 10;
+  }
+  .floor-image-pin:hover {
+    transform: translate(-50%, -50%) scale(1.3);
+    background-color: #e67e22;
+  }
+  /* 地図ピンや画像ピンが選択されたときの強調表示 */
+  .floor-image-pin.selected {
+    background-color: #e67e22;
+    transform: translate(-50%, -50%) scale(1.4);
+    box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.4);
+  }
 </style>
 
 ---
@@ -152,5 +241,3 @@
 * 小田急線町田駅「西口」から徒歩約8分
 * JR横浜線町田駅「北口」から徒歩約11分
 > ※イベント当日は混雑が予想されます。公共交通機関でのご来場にご協力をお願いいたします。
-
----
