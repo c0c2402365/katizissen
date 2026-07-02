@@ -1,6 +1,6 @@
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
-<div class="map-navigation-wrapper" style="font-family: sans-serif; font-size: 16px; color: #333; max-width: 1200px; margin: 0 auto;">
+<div class="map-navigation-wrapper" style="font-family: sans-serif; font-size: 25px; color: #333; max-width: 1200px; margin: 0 auto;">
 
   <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: #555;">
     見たいエリア・階数のボタンを押すと、アクセスマップのピン位置と、右側の詳細なフロアマップ画像が同時に切り替わります。また、地図上のピンやフロアマップ上のピンをクリックすると各スペースの出展概要が表示されます。
