@@ -16,7 +16,13 @@
   <div class="map-block" style="flex: 1; min-width: 320px;">
     <h3 style="margin-top: 0;">📍 アクセスマップ</h3>
     <div id="event-map" style="width: 100%; height: 420px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
-  </div>
+    
+    <div style="text-align: center; margin-top: 10px;">
+      <a href="https://www.google.com/maps/dir/?api=1&destination=35.545199,139.442838" target="_blank" class="route-btn">
+        🚶 現在地から市役所へのルート案内を開く
+      </a>
+    </div>
+    </div>
 
   <div class="image-block" style="flex: 1; min-width: 320px; text-align: center;">
     <h3 style="margin-top: 0; text-align: left;">🏢 庁舎内・会場レイアウト</h3>
@@ -59,9 +65,9 @@
   const defaultCoords = [35.545199, 139.442838];
   let map;
   let markerGroup;
+  let routeGroup; // ルート案内線用のグループを追加
   let leafletMarkers = {}; 
 
-  // mapPos（画像内の位置％）を実際の部屋の位置に合わせて調整済み
   const pinData = [
     { id: 1, floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54535, 139.44265], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！', mapPos: null },
     { id: 2, floor: '1f_out', img: 'all_img', name: '1F 屋外ここもれび広場', coords: [35.54540, 139.44285], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。', mapPos: null },
@@ -70,26 +76,60 @@
     { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側（201横）】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '82%', left: '45%' } },
     { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階中央〜右側】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '33%', left: '79%' } },
     { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '48%', left: '30%' } },
-    
-    // ▼ 3Fのピン位置 (mapPos) を調整しました ▼
-    { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302近辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '35%', left: '25%' } }, // 左側の会議室エリア付近
-    { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '48%', left: '50%' } }, // 中央のアトリウム付近
-    { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '65%', left: '82%' } }, // 右下の議場付近
-    // ▲ ここまで ▲
-
+    { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302近辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '35%', left: '25%' } },
+    { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '48%', left: '50%' } },
+    { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '65%', left: '82%' } },
     { id: 11, floor: 'hall',  img: 'all_img', name: '町田市民ホール（サテライト会場）', coords: [35.54394, 139.44111], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！', mapPos: null }
   ];
 
+  // ▼ 駅から会場までの案内ルート座標を追加 ▼
+  const walkingRoutes = [
+    // 小田急町田駅 → 市役所のルート
+    [[35.54400, 139.44430], [35.54440, 139.44385], [35.54500, 139.44315], [35.54519, 139.44283]],
+    // JR町田駅 → 小田急合流点のルート
+    [[35.54260, 139.44560], [35.54330, 139.44490], [35.54400, 139.44430]],
+    // 市役所 → 市民ホールのルート
+    [[35.54519, 139.44283], [35.54480, 139.44250], [35.54420, 139.44130], [35.54394, 139.44111]]
+  ];
+
   document.addEventListener("DOMContentLoaded", function() {
-    map = L.map('event-map').setView(defaultCoords, 17);
+    map = L.map('event-map').setView(defaultCoords, 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
     markerGroup = L.layerGroup().addTo(map);
+    routeGroup = L.layerGroup().addTo(map); // ルート線用グループ
+
+    // 駅のマーカーを追加
+    drawStationMarkers();
+
     showFloorPins('all');
     renderImagePins();
   });
+
+  // ▼ 駅のピンとルート線を地図に描画する関数 ▼
+  function drawStationMarkers() {
+    // 小田急線町田駅
+    L.marker([35.54400, 139.44430], { opacity: 0.8 })
+      .bindPopup("<b>🚉 小田急線 町田駅（西口）</b><br>ここから徒歩約8分")
+      .addTo(routeGroup);
+    
+    // JR横浜線町田駅
+    L.marker([35.54260, 139.44560], { opacity: 0.8 })
+      .bindPopup("<b>🚉 JR横浜線 町田駅（北口）</b><br>ここから徒歩約11分")
+      .addTo(routeGroup);
+
+    // 徒歩ルートを点線で描画
+    walkingRoutes.forEach(route => {
+      L.polyline(route, { 
+        color: '#4285f4', 
+        weight: 5, 
+        opacity: 0.7, 
+        dashArray: '8, 8' 
+      }).addTo(routeGroup);
+    });
+  }
 
   function switchFloorMap(floorId, imgId) {
     const buttons = document.getElementsByClassName('floor-btn');
@@ -120,7 +160,16 @@
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
-        marker.bindPopup(`<b>${pin.name}</b><br><span style="font-size:12px; color:#555;">${pin.desc}</span>`);
+        
+        // ポップアップの中にGoogle Mapsへのリンクを追加
+        const popupContent = `
+          <b>${pin.name}</b><br>
+          <span style="font-size:12px; color:#555;">${pin.desc}</span><br>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${pin.coords[0]},${pin.coords[1]}" target="_blank" style="display:inline-block; margin-top:5px; font-size:11px; color:#0066cc;">
+            ↗ Google Mapsでここへのルートを見る
+          </a>
+        `;
+        marker.bindPopup(popupContent);
         
         marker.on('click', function() {
           changeFloorImage(pin.img);
@@ -133,9 +182,9 @@
     });
 
     if (floorId === 'hall') {
-      map.panTo([35.54394, 139.44111]);
+      map.setView([35.54394, 139.44111], 17); // 市民ホールにフォーカス
     } else {
-      map.panTo(defaultCoords);
+      map.setView(defaultCoords, 16); // 全体が見えるようにズームを16に少し引く
     }
   }
 
@@ -201,6 +250,24 @@
   }
   .floor-btn:hover {
     background: #ddd;
+  }
+
+  /* ルート案内ボタンの装飾 */
+  .route-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    background-color: #4285f4;
+    color: white;
+    text-decoration: none;
+    border-radius: 24px;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s;
+  }
+  .route-btn:hover {
+    background-color: #3367d6;
+    color: white;
   }
 
   .floor-image-pin {
