@@ -28,6 +28,7 @@
         地図のピンからも連動して部屋の位置を確認できます！
       </p>
     </div>
+    
 
     <div id="floor1_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
       <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
