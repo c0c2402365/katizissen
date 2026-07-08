@@ -1,7 +1,38 @@
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
 <p>見たいエリア・階数のボタンを押すと、アクセスマップのピン位置と、右側の詳細なフロアマップ画像が同時に切り替わります。また、地図上のピンやフロアマップ上のピンをクリックすると各スペースの出展概要が表示されます。</p>
+<!-- マップ全体を囲むコンテナ -->
+<div class="map-wrapper" style="position: relative; display: inline-block; width: 100%;">
+  
+  <!-- 1. フロアマップ画像 -->
+  <img src="1F.jpeg" alt="フロアマップ" style="width: 100%; height: auto; display: block;">
 
+  <!-- 2. 道案内＆ピン描画用SVG -->
+  <!-- ※ viewBox には元画像の実際の幅・高さを指定します（例: 1920x1080の場合 -> "0 0 1920 1080"） -->
+  <svg class="map-overlay" viewBox="0 0 1920 1080" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;">
+    
+    <!-- 経路（道案内）の線: pointsに通過する点(X, Y)を順番に指定 -->
+    <polyline points="200,300 400,300 400,600 750,600" 
+              fill="none" 
+              stroke="#007bff" 
+              stroke-width="10" 
+              stroke-dasharray="12 6" 
+              stroke-linecap="round" />
+
+    <!-- 現在地 / スタート地点（緑の点） -->
+    <circle cx="200" cy="300" r="16" fill="#28a745" stroke="#ffffff" stroke-width="4" />
+
+    <!-- 目的地（修正版・赤い点） -->
+    <circle cx="750" cy="600" r="16" fill="#dc3545" stroke="#ffffff" stroke-width="4" />
+  </svg>
+
+</div>
 <div class="map-controls" style="margin-bottom: 20px;">
   <button class="floor-btn active" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
   <button class="floor-btn" onclick="switchFloorMap('1f_out', 'all_img')">1F 屋外マルシェ・広場</button>
