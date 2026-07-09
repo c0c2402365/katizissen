@@ -1,1 +1,1 @@
-# katizissen
+# katizisse プロトタイプ
