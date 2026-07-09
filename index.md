@@ -1,3 +1,11 @@
+<!-- ▼ 追加：ページ上部のナビゲーション（event.md へのリンク） ▼ -->
+<div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 14px 18px; border-radius: 8px; border: 1px solid #d0d7de; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+  <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">📍 会場マップナビゲーション</span>
+  <a href="event.md" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #27ae60; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+    <span>📅</span> イベントプログラム・出展一覧はこちら ➔
+  </a>
+</div>
+
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
 <p style="font-size: 16px; line-height: 1.6;">見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
