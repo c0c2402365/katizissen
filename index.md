@@ -1,14 +1,42 @@
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
-<p>見たいエリア・階数のボタンを押すと、アクセスマップのピン位置と、右側の詳細なフロアマップ画像が同時に切り替わります。また、地図上のピンやフロアマップ上のピンをクリックすると各スペースの出展概要が表示されます。</p>
+<p>見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
+
+<!-- ▼ 追加：手動ナビゲーション（フロア ＋ エリア選択） ▼ -->
+<div class="manual-nav-box" style="background: #f0f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d0d7de;">
+  <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+    <span>🔍</span> フロア・エリアから直接探す
+  </h4>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 160px;">
+      <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px; font-weight: bold;">① フロアを選択</label>
+      <select id="floor-select" onchange="onFloorSelectChange(this.value)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 14px;">
+        <option value="all">全エリア表示</option>
+        <option value="1f_out">1F 屋外マルシェ・広場</option>
+        <option value="1f_in">1F 屋内（ワンストップ・みんなの広場）</option>
+        <option value="2f">2F 会議室・おうえん・キッズスペース</option>
+        <option value="3f">3F 会議室・アトリウム・議場</option>
+        <option value="hall">市民ホール</option>
+      </select>
+    </div>
+    
+    <div style="flex: 1; min-width: 200px;">
+      <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px; font-weight: bold;">② エリア・ブースを選択</label>
+      <select id="area-select" onchange="onAreaSelectChange(this.value)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 14px;" disabled>
+        <option value="">フロアを先に選択してください</option>
+      </select>
+    </div>
+  </div>
+</div>
+<!-- ▲ 追加箇所 ▲ -->
 
 <div class="map-controls" style="margin-bottom: 20px;">
-  <button class="floor-btn active" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
-  <button class="floor-btn" onclick="switchFloorMap('1f_out', 'all_img')">1F 屋外マルシェ・広場</button>
-  <button class="floor-btn" onclick="switchFloorMap('1f_in', 'floor1_img')">1F 屋内（ワンストップ・みんなの広場）</button>
-  <button class="floor-btn" onclick="switchFloorMap('2f', 'floor2_img')">2F 会議室・おうえん・キッズスペース</button>
-  <button class="floor-btn" onclick="switchFloorMap('3f', 'floor3_img')">3F 会議室・アトリウム・議場</button>
-  <button class="floor-btn" onclick="switchFloorMap('hall', 'all_img')">市民ホール</button>
+  <button class="floor-btn active" data-floor="all" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
+  <button class="floor-btn" data-floor="1f_out" onclick="switchFloorMap('1f_out', 'all_img')">1F 屋外</button>
+  <button class="floor-btn" data-floor="1f_in" onclick="switchFloorMap('1f_in', 'floor1_img')">1F 屋内</button>
+  <button class="floor-btn" data-floor="2f" onclick="switchFloorMap('2f', 'floor2_img')">2F</button>
+  <button class="floor-btn" data-floor="3f" onclick="switchFloorMap('3f', 'floor3_img')">3F</button>
+  <button class="floor-btn" data-floor="hall" onclick="switchFloorMap('hall', 'all_img')">市民ホール</button>
 </div>
 
 <div class="map-flex-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
@@ -23,9 +51,9 @@
     
     <div id="all_img" class="floor-img-content" style="display: block; padding: 60px 20px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 8px;">
       <p style="color: #666; margin: 0; font-size: 14px;">
-        上のボタンから<b>「1F屋内」「2F」「3F」</b>を選択すると、<br>
+        上の選択メニューまたはボタンから<b>「1F屋内」「2F」「3F」</b>を選択すると、<br>
         ここに詳細なフロアマップ（画像）が表示されます。<br><br>
-        地図のピンからも連動して部屋の位置を確認できます！
+        地図や画像のピンからも連動して確認できます！
       </p>
     </div>
 
@@ -47,9 +75,9 @@
 
 </div>
 
-<div id="floor-pin-info" style="margin-top: 15px; padding: 10px 15px; background: #fffcf5; border-left: 4px solid #e67e22; border-radius: 4px; display: none;">
-  <strong id="info-title" style="color: #d35400;"></strong>
-  <p id="info-desc" style="margin: 5px 0 0 0; font-size: 13px; color: #333;"></p>
+<div id="floor-pin-info" style="margin-top: 15px; padding: 12px 15px; background: #fffcf5; border-left: 4px solid #e67e22; border-radius: 4px; display: none;">
+  <strong id="info-title" style="color: #d35400; font-size: 15px;"></strong>
+  <p id="info-desc" style="margin: 5px 0 0 0; font-size: 13px; color: #333; line-height: 1.5;"></p>
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -61,14 +89,22 @@
   let markerGroup;
   let leafletMarkers = {}; 
 
-  // 各画像内の各部屋・エリアの位置(mapPos %)
+  const floorImgMap = {
+    'all': 'all_img',
+    '1f_out': 'all_img',
+    '1f_in': 'floor1_img',
+    '2f': 'floor2_img',
+    '3f': 'floor3_img',
+    'hall': 'all_img'
+  };
+
   const pinData = [
     { id: 1, floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54535, 139.44265], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！', mapPos: null },
     { id: 2, floor: '1f_out', img: 'all_img', name: '1F 屋外こもれび広場', coords: [35.54540, 139.44285], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。', mapPos: null },
     { id: 3, floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54515, 139.44275], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。', mapPos: { top: '70%', left: '78%' } },
     { id: 4, floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54510, 139.44295], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。', mapPos: { top: '48%', left: '48%' } },
     { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '80%', left: '47%' } },
-    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階右上・208-210エリア】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '30%', left: '73%' } },
+    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階右上・208-210エリア】ミニまちだ駄菓子屋、おしごなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '30%', left: '73%' } },
     { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '50%', left: '30%' } },
     { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302号室周辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '16%', left: '67%' } },
     { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '61%', left: '44%' } },
@@ -87,16 +123,87 @@
     renderImagePins();
   });
 
-  function switchFloorMap(floorId, imgId) {
-    const buttons = document.getElementsByClassName('floor-btn');
-    for (let btn of buttons) { btn.classList.remove('active'); }
-    
-    if(window.event && window.event.currentTarget) {
-      window.event.currentTarget.classList.add('active');
+  // ドロップダウン：フロア変更時
+  function onFloorSelectChange(floorId) {
+    const imgId = floorImgMap[floorId] || 'all_img';
+    switchFloorMap(floorId, imgId, true);
+  }
+
+  // ドロップダウン：エリア変更時
+  function onAreaSelectChange(pinId) {
+    if (!pinId) return;
+    const pin = pinData.find(p => p.id == pinId);
+    if (pin) {
+      triggerPinSelection(pin);
     }
+  }
+
+  // ボタンやドロップダウンからのフロア切替
+  function switchFloorMap(floorId, imgId, isFromDropdown = false) {
+    // ボタン表示同期
+    const buttons = document.getElementsByClassName('floor-btn');
+    for (let btn of buttons) {
+      btn.classList.remove('active');
+      if (btn.getAttribute('data-floor') === floorId) {
+        btn.classList.add('active');
+      }
+    }
+
+    // フロアドロップダウン同期
+    if (!isFromDropdown) {
+      document.getElementById('floor-select').value = floorId;
+    }
+
+    // エリアドロップダウン更新
+    updateAreaSelectDropdown(floorId);
 
     showFloorPins(floorId);
     changeFloorImage(imgId);
+
+    document.getElementById('floor-pin-info').style.display = 'none';
+  }
+
+  function updateAreaSelectDropdown(floorId) {
+    const areaSelect = document.getElementById('area-select');
+    areaSelect.innerHTML = '';
+
+    if (floorId === 'all') {
+      areaSelect.innerHTML = '<option value="">フロアを先に選択してください</option>';
+      areaSelect.disabled = true;
+    } else {
+      areaSelect.disabled = false;
+      const defaultOption = document.createElement('option');
+      defaultOption.value = "";
+      defaultOption.textContent = "エリア・ブースを選択してください";
+      areaSelect.appendChild(defaultOption);
+
+      const filtered = pinData.filter(p => p.floor === floorId);
+      filtered.forEach(pin => {
+        const opt = document.createElement('option');
+        opt.value = pin.id;
+        opt.textContent = pin.name;
+        areaSelect.appendChild(opt);
+      });
+    }
+  }
+
+  function triggerPinSelection(pin) {
+    changeFloorImage(pin.img);
+    highlightImagePin(pin.id);
+
+    // 情報カード表示
+    document.getElementById('info-title').innerText = pin.name;
+    document.getElementById('info-desc').innerText = pin.desc;
+    document.getElementById('floor-pin-info').style.display = 'block';
+
+    // エリアドロップダウン選択肢を同期
+    document.getElementById('area-select').value = pin.id;
+
+    // 地図ポップアップ＆中央移動
+    if (leafletMarkers[pin.id]) {
+      leafletMarkers[pin.id].openPopup();
+      map.panTo(pin.coords);
+    }
   }
 
   function changeFloorImage(imgId) {
@@ -119,8 +226,7 @@
         marker.bindPopup(`<b>${pin.name}</b><br><span style="font-size:12px; color:#555;">${pin.desc}</span>`);
         
         marker.on('click', function() {
-          changeFloorImage(pin.img);
-          highlightImagePin(pin.id);
+          triggerPinSelection(pin);
         });
 
         markerGroup.addLayer(marker);
@@ -149,16 +255,7 @@
           pinEl.title = pin.name;
 
           pinEl.addEventListener('click', function() {
-            document.getElementById('info-title').innerText = pin.name;
-            document.getElementById('info-desc').innerText = pin.desc;
-            document.getElementById('floor-pin-info').style.display = 'block';
-
-            if (leafletMarkers[pin.id]) {
-              leafletMarkers[pin.id].openPopup();
-              map.panTo(pin.coords);
-            }
-
-            highlightImagePin(pin.id);
+            triggerPinSelection(pin);
           });
 
           container.appendChild(pinEl);
