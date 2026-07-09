@@ -1,16 +1,16 @@
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
-<p>見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
+<p style="font-size: 16px; line-height: 1.6;">見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
 
-<!-- ▼ 追加：手動ナビゲーション（フロア ＋ エリア選択） ▼ -->
-<div class="manual-nav-box" style="background: #f0f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d0d7de;">
-  <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+<!-- 手動ナビゲーション（フロア ＋ エリア選択） -->
+<div class="manual-nav-box" style="background: #f0f4f8; padding: 18px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d0d7de;">
+  <h4 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 18px; display: flex; align-items: center; gap: 8px;">
     <span>🔍</span> フロア・エリアから直接探す
   </h4>
-  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 160px;">
-      <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px; font-weight: bold;">① フロアを選択</label>
-      <select id="floor-select" onchange="onFloorSelectChange(this.value)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 14px;">
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 180px;">
+      <label style="font-size: 14px; color: #444; display: block; margin-bottom: 6px; font-weight: bold;">① フロアを選択</label>
+      <select id="floor-select" onchange="onFloorSelectChange(this.value)" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 16px;">
         <option value="all">全エリア表示</option>
         <option value="1f_out">1F 屋外マルシェ・広場</option>
         <option value="1f_in">1F 屋内（ワンストップ・みんなの広場）</option>
@@ -20,15 +20,14 @@
       </select>
     </div>
     
-    <div style="flex: 1; min-width: 200px;">
-      <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px; font-weight: bold;">② エリア・ブースを選択</label>
-      <select id="area-select" onchange="onAreaSelectChange(this.value)" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 14px;" disabled>
+    <div style="flex: 1; min-width: 220px;">
+      <label style="font-size: 14px; color: #444; display: block; margin-bottom: 6px; font-weight: bold;">② エリア・ブースを選択</label>
+      <select id="area-select" onchange="onAreaSelectChange(this.value)" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 16px;" disabled>
         <option value="">フロアを先に選択してください</option>
       </select>
     </div>
   </div>
 </div>
-<!-- ▲ 追加箇所 ▲ -->
 
 <div class="map-controls" style="margin-bottom: 20px;">
   <button class="floor-btn active" data-floor="all" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
@@ -42,15 +41,15 @@
 <div class="map-flex-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
   
   <div class="map-block" style="flex: 1; min-width: 320px;">
-    <h3 style="margin-top: 0;">📍 アクセスマップ</h3>
+    <h3 style="margin-top: 0; font-size: 20px;">📍 アクセスマップ</h3>
     <div id="event-map" style="width: 100%; height: 420px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
   </div>
 
   <div class="image-block" style="flex: 1; min-width: 320px; text-align: center;">
-    <h3 style="margin-top: 0; text-align: left;">🏢 庁舎内・会場レイアウト</h3>
+    <h3 style="margin-top: 0; text-align: left; font-size: 20px;">🏢 庁舎内・会場レイアウト</h3>
     
     <div id="all_img" class="floor-img-content" style="display: block; padding: 60px 20px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 8px;">
-      <p style="color: #666; margin: 0; font-size: 14px;">
+      <p style="color: #555; margin: 0; font-size: 16px; line-height: 1.6;">
         上の選択メニューまたはボタンから<b>「1F屋内」「2F」「3F」</b>を選択すると、<br>
         ここに詳細なフロアマップ（画像）が表示されます。<br><br>
         地図や画像のピンからも連動して確認できます！
@@ -75,9 +74,9 @@
 
 </div>
 
-<div id="floor-pin-info" style="margin-top: 15px; padding: 12px 15px; background: #fffcf5; border-left: 4px solid #e67e22; border-radius: 4px; display: none;">
-  <strong id="info-title" style="color: #d35400; font-size: 15px;"></strong>
-  <p id="info-desc" style="margin: 5px 0 0 0; font-size: 13px; color: #333; line-height: 1.5;"></p>
+<div id="floor-pin-info" style="margin-top: 20px; padding: 15px 18px; background: #fffcf5; border-left: 5px solid #e67e22; border-radius: 6px; display: none;">
+  <strong id="info-title" style="color: #d35400; font-size: 18px; display: block;"></strong>
+  <p id="info-desc" style="margin: 8px 0 0 0; font-size: 15px; color: #333; line-height: 1.6;"></p>
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -104,7 +103,7 @@
     { id: 3, floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54515, 139.44275], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。', mapPos: { top: '70%', left: '78%' } },
     { id: 4, floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54510, 139.44295], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。', mapPos: { top: '48%', left: '48%' } },
     { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '80%', left: '47%' } },
-    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階右上・208-210エリア】ミニまちだ駄菓子屋、おしごなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '30%', left: '73%' } },
+    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階右上・208-210エリア】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '30%', left: '73%' } },
     { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '50%', left: '30%' } },
     { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302号室周辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '16%', left: '67%' } },
     { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '61%', left: '44%' } },
@@ -223,7 +222,7 @@
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
-        marker.bindPopup(`<b>${pin.name}</b><br><span style="font-size:12px; color:#555;">${pin.desc}</span>`);
+        marker.bindPopup(`<b style="font-size: 15px;">${pin.name}</b><br><span style="font-size:14px; color:#555; line-height: 1.4; display: inline-block; margin-top: 4px;">${pin.desc}</span>`);
         
         marker.on('click', function() {
           triggerPinSelection(pin);
@@ -277,13 +276,14 @@
 
 <style>
   .floor-btn {
-    padding: 8px 14px;
-    font-size: 13px;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
     background: #f7f9fa;
     border: 1px solid #ced4da;
     border-radius: 20px;
-    margin: 3px;
+    margin: 4px;
     transition: all 0.2s;
   }
   .floor-btn.active {
@@ -293,13 +293,13 @@
     font-weight: bold;
   }
   .floor-btn:hover {
-    background: #ddd;
+    background: #e2e8f0;
   }
 
   .floor-image-pin {
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     background-color: #ff3b30;
     border: 2px solid white;
     border-radius: 50%;
