@@ -314,15 +314,16 @@
     cursor: pointer;
     transform: translate(-50%, -50%);
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-    transition: transform 0.2s, background-color 0.2s;
+    transition: transform 0.2s, border-color 0.2s;
     z-index: 10;
   }
   .floor-image-pin:hover {
     transform: translate(-50%, -50%) scale(1.3);
-    background-color: #e67e22;
+    border-color: #e67e22;
+    border: 3px solid #ff3b30;
   }
   .floor-image-pin.selected {
-    background-color: #e67e22;
+    border-color: #e67e22;
     transform: translate(-50%, -50%) scale(1.4);
     box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.4);
   }
