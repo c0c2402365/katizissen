@@ -1,4 +1,3 @@
-<!-- ▼ イベントプログラム（events.html）へのリンク ▼ -->
 <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 14px 18px; border-radius: 8px; border: 1px solid #d0d7de; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
   <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">📍 会場マップナビゲーション</span>
   <a href="events.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #27ae60; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
@@ -10,7 +9,6 @@
 
 <p style="font-size: 16px; line-height: 1.6;">見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
 
-<!-- 手動ナビゲーション（フロア ＋ エリア選択） -->
 <div class="manual-nav-box" style="background: #f0f4f8; padding: 18px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d0d7de;">
   <h4 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 18px; display: flex; align-items: center; gap: 8px;">
     <span>🔍</span> フロア・エリアから直接探す
@@ -116,13 +114,16 @@
     { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302号室周辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '16%', left: '67%' } },
     { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '61%', left: '44%' } },
     { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '45%', left: '82%' } },
-    { id: 11, floor: 'hall',  img: 'all_img', name: '町田市民ホール（サテライト会場）', coords: [35.54394, 139.44111], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！', mapPos: null }
+    { id: 11, floor: 'hall',  img: 'all_img', name: '町田市民ホール', coords: [35.54394, 139.44111], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！', mapPos: null }
   ];
 
   document.addEventListener("DOMContentLoaded", function() {
     map = L.map('event-map').setView(defaultCoords, 17);
+    
+    // ▼ 修正: detectRetina を true にして、拡大時の地図文字を相対的に小さく高精細に表示
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      detectRetina: true
     }).addTo(map);
 
     markerGroup = L.layerGroup().addTo(map);
@@ -230,7 +231,9 @@
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
-        marker.bindPopup(`<b style="font-size: 15px;">${pin.name}</b><br><span style="font-size:14px; color:#555; line-height: 1.4; display: inline-block; margin-top: 4px;">${pin.desc}</span>`);
+        
+        // ▼ 修正: ポップアップ内の文字サイズを小さく調整 (13px / 12px)
+        marker.bindPopup(`<b style="font-size: 13px;">${pin.name}</b><br><span style="font-size:12px; color:#555; line-height: 1.4; display: inline-block; margin-top: 4px;">${pin.desc}</span>`);
         
         marker.on('click', function() {
           triggerPinSelection(pin);
@@ -283,6 +286,15 @@
 </script>
 
 <style>
+  /* ▼ 修正: マップ上のピン画像の不要な背景・枠線（MarkdownのCSS競合）を強制的に透明化リセット */
+  .leaflet-marker-icon,
+  .leaflet-marker-shadow {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
   .floor-btn {
     padding: 10px 18px;
     font-size: 15px;
@@ -308,22 +320,22 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    background-color: #ff3b30;
-    border: 2px solid white;
+    /* ▼ 修正: フロアマップ側の丸ピンも少し透明度を持たせる (rgbaでアルファ値を設定) */
+    background-color: rgba(255, 59, 48, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     cursor: pointer;
     transform: translate(-50%, -50%);
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-    transition: transform 0.2s, border-color 0.2s;
+    transition: transform 0.2s, background-color 0.2s;
     z-index: 10;
   }
   .floor-image-pin:hover {
     transform: translate(-50%, -50%) scale(1.3);
-    border-color: #e67e22;
-    border: 3px solid #ff3b30;
+    background-color: rgba(230, 126, 34, 0.9);
   }
   .floor-image-pin.selected {
-    border-color: #e67e22;
+    background-color: rgba(230, 126, 34, 1);
     transform: translate(-50%, -50%) scale(1.4);
     box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.4);
   }
