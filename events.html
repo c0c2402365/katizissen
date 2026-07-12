@@ -1,66 +1,359 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>まちカフェ！2025 出展・イベント団体一覧</title>
   <style>
-    body { margin: 0; padding: 24px; background: #fff; color: #1f2328; line-height: 1.7; }
-    .event-page-container { max-width: 1100px; margin: 0 auto; color: #1f2328; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #d0d7de; padding: 8px; color: #1f2328; }
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2328;
+      --muted: #59636e;
+      --primary: #1f8f5f;
+      --primary-weak: #e8f7ef;
+      --line: #d0d7de;
+      --head: #f1f8f5;
+      --warning: #fff7ea;
+      --warning-line: #f4b24c;
+      --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+    }
+
+    .event-page-container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 20px auto 40px;
+    }
+
+    .hero {
+      background: linear-gradient(120deg, #1f8f5f 0%, #37a96e 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: clamp(22px, 2.8vw, 32px);
+      line-height: 1.25;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 15px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(246, 248, 251, 0.92);
+      backdrop-filter: blur(5px);
+      padding: 10px 0 12px;
+      margin-bottom: 10px;
+    }
+
+    .toolbar-inner {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .field select,
+    .field input,
+    .btn {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 0 12px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .field input::placeholder {
+      color: #8a949e;
+    }
+
+    .btn {
+      cursor: pointer;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .btn:hover {
+      background: #f3f4f6;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn.primary:hover {
+      filter: brightness(0.95);
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      background: var(--primary-weak);
+      color: #0d683f;
+      border: 1px solid #b6e2c8;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    #no-results {
+      display: none;
+      background: var(--warning);
+      border-left: 4px solid var(--warning-line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      color: #6f4b00;
+      font-weight: 600;
+    }
+
+    #content {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    #content h2,
+    #content h3 {
+      margin-top: 1.2em;
+      margin-bottom: 0.5em;
+      line-height: 1.35;
+    }
+
+    #content h2 {
+      border-left: 5px solid var(--primary);
+      padding-left: 10px;
+      font-size: clamp(20px, 2vw, 26px);
+      background: #f7fdf9;
+      border-radius: 6px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    #content h3 {
+      color: #1b4f35;
+      font-size: clamp(16px, 1.6vw, 20px);
+    }
+
+    .table-block {
+      margin: 12px 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .table-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #f9fbfd;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--head);
+      color: #143524;
+      z-index: 1;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    tbody tr:hover {
+      background: #eef8f2;
+    }
+
+    .genre-tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #c6d6e5;
+      background: #f7fbff;
+      color: #23445f;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      margin-right: 4px;
+      margin-bottom: 3px;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 980px) {
+      .toolbar-inner {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .event-page-container {
+        width: calc(100% - 16px);
+        margin-top: 10px;
+      }
+
+      .hero {
+        border-radius: 12px;
+        padding: 16px;
+      }
+
+      .toolbar-inner {
+        grid-template-columns: 1fr;
+        border-radius: 12px;
+      }
+
+      #content {
+        padding: 12px;
+      }
+
+      th,
+      td {
+        font-size: 13px;
+        padding: 7px 8px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="event-page-container">
-    <!-- いまの本文をここに置く -->
-  </div>
-</body>
-</html>
-# 🎪 まちカフェ！2025 出展・イベント団体一覧
+    <header class="hero">
+      <h1>🎪 まちカフェ！2025 出展・イベント団体一覧</h1>
+      <p>会場別・日時別にイベント情報を整理しています。検索・絞り込みで目的の団体やブースをすぐ見つけられます。</p>
+    </header>
 
+    <section class="toolbar" aria-label="検索と絞り込み">
+      <div class="toolbar-inner">
+        <div class="field">
+          <label for="filter-floor">🏢 階層・エリア</label>
+          <select id="filter-floor">
+            <option value="all">すべてのエリア</option>
+            <option value="1f_out">1F 屋外（マルシェ・広場）</option>
+            <option value="1f_in">1F 屋内（みんなの広場・ワンストップ）</option>
+            <option value="2f">2F（おうえんルーム・会議室など）</option>
+            <option value="3f">3F（アトリウム・議場・会議室など）</option>
+            <option value="hall">市民ホール</option>
+            <option value="other">別日程・サテライト会場</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="filter-genre">🏷️ ジャンル</label>
+          <select id="filter-genre">
+            <option value="all">すべてのジャンル</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="filter-text">✏️ フリーワード</label>
+          <input id="filter-text" type="text" placeholder="団体名やキーワードを入力">
+        </div>
+
+        <div class="toolbar-actions">
+          <button id="reset-btn" class="btn" type="button">条件をクリア</button>
+          <button id="search-btn" class="btn primary" type="button">検索</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="stats">
+      <span class="chip" id="stat-total">総件数: -</span>
+      <span class="chip" id="stat-visible">表示件数: -</span>
+      <span class="chip" id="stat-tables">表示テーブル: -</span>
+    </div>
+
+    <div id="no-results">該当するイベント・ブースが見つかりませんでした。条件を変更してお試しください。</div>
+    <main id="content" aria-live="polite"></main>
+  </div>
+
+  <script id="events-markdown" type="text/plain">
 2025年度に開催された「まちカフェ！」の出展団体およびイベントの一覧です。
 会場別・日時別にまとめています。お目当てのブースやイベントをチェックしてみましょう！
-
-<!-- ▼ 検索機能エリア ▼ -->
-<div class="search-container">
-  <h3>🔍 イベント・ブースを探す</h3>
-  <div class="search-filters">
-    <div class="search-group">
-      <label>🏢 階層・エリアで絞り込む</label>
-      <select id="filter-floor">
-        <option value="all">すべてのエリア</option>
-        <option value="1f_out">1F 屋外（マルシェ・広場）</option>
-        <option value="1f_in">1F 屋内（みんなの広場・ワンストップ）</option>
-        <option value="2f">2F（おうえんルーム・会議室など）</option>
-        <option value="3f">3F（アトリウム・議場・会議室など）</option>
-        <option value="hall">市民ホール</option>
-        <option value="other">別日程・サテライト会場</option>
-      </select>
-    </div>
-    <div class="search-group">
-      <label>🏷️ ジャンルで絞り込む</label>
-      <select id="filter-genre">
-        <option value="all">すべてのジャンル</option>
-        <option value="体験">体験・ワークショップ</option>
-        <option value="展示">展示</option>
-        <option value="販売">物販・飲食販売</option>
-        <option value="子ども">子ども向け</option>
-        <option value="相談">相談会</option>
-        <option value="演奏">演奏・パフォーマンス</option>
-        <option value="講演">講演・上映会</option>
-      </select>
-    </div>
-    <div class="search-group">
-      <label>✏️ フリーワード検索</label>
-      <input type="text" id="filter-text" placeholder="団体名やキーワードを入力...">
-    </div>
-  </div>
-</div>
-
-<div id="no-results">
-  該当するイベント・ブースが見つかりませんでした。<br>検索条件を変更してお試しください。
-</div>
 
 ---
 
@@ -277,109 +570,259 @@
 | 12月06日(土) | コレクティブハウス本町田 | 【本町田】居住者が語る〈つながる暮らし〉 | 講演 |
 | 12月06日(土) | アムネスティ町田グループ | 【市民ホール】多民族、多文化社会で生きる | 講演 |
 | 12月13日(土) | いざ！鎌倉古道の会 | 【町田市内】歴史街道のまち・町田を歩こう！ | 体験 |
+  </script>
 
-</div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const content = document.getElementById("content");
+      const filterFloor = document.getElementById("filter-floor");
+      const filterGenre = document.getElementById("filter-genre");
+      const filterText = document.getElementById("filter-text");
+      const resetBtn = document.getElementById("reset-btn");
+      const searchBtn = document.getElementById("search-btn");
+      const noResults = document.getElementById("no-results");
+      const statTotal = document.getElementById("stat-total");
+      const statVisible = document.getElementById("stat-visible");
+      const statTables = document.getElementById("stat-tables");
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const filterFloor = document.getElementById("filter-floor");
-  const filterGenre = document.getElementById("filter-genre");
-  const filterText = document.getElementById("filter-text");
-  const noResultsMsg = document.getElementById("no-results");
+      const markdownSource = document.getElementById("events-markdown").textContent.trim();
 
-  // Markdownが生成したテーブルをスマホで横スクロール可能にするラッパーを追加
-  const tables = document.querySelectorAll(".event-page-container table");
-  tables.forEach(table => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "table-wrapper";
-    table.parentNode.insertBefore(wrapper, table);
-    wrapper.appendChild(table);
-  });
+      const esc = function (s) {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      };
 
-  function performSearch() {
-    const floorVal = filterFloor.value;
-    const genreVal = filterGenre.value;
-    const textVal = filterText.value.toLowerCase();
+      const parseInline = function (s) {
+        return esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      };
 
-    let totalVisibleRows = 0;
+      const renderMarkdown = function (md) {
+        const lines = md.replace(/\r/g, "").split("\n");
+        const out = [];
+        let i = 0;
 
-    tables.forEach(table => {
-      // 直前の見出し(h3/h2)から階層エリアを判定
-      let prevElement = table.closest('.table-wrapper').previousElementSibling;
-      let areaContext = "all";
-      
-      while(prevElement) {
-        if (prevElement.tagName === "H3" || prevElement.tagName === "H2") {
-          const headingText = prevElement.innerText;
-          if (headingText.includes("1F 屋外")) areaContext = "1f_out";
-          else if (headingText.includes("1F 屋内")) areaContext = "1f_in";
-          else if (headingText.includes("2F")) areaContext = "2f";
-          else if (headingText.includes("3F") || headingText.includes("議場")) areaContext = "3f";
-          else if (headingText.includes("市民ホール")) areaContext = "hall";
-          else if (headingText.includes("別日程") || headingText.includes("サテライト")) areaContext = "other";
-          break;
+        const toCells = function (line) {
+          return line
+            .trim()
+            .replace(/^\|/, "")
+            .replace(/\|$/, "")
+            .split("|")
+            .map(function (x) { return x.trim(); });
+        };
+
+        while (i < lines.length) {
+          const line = lines[i].trim();
+
+          if (!line) {
+            i += 1;
+            continue;
+          }
+
+          if (line === "---") {
+            out.push("<hr>");
+            i += 1;
+            continue;
+          }
+
+          if (line.startsWith("### ")) {
+            out.push("<h3>" + parseInline(line.slice(4)) + "</h3>");
+            i += 1;
+            continue;
+          }
+
+          if (line.startsWith("## ")) {
+            out.push("<h2>" + parseInline(line.slice(3)) + "</h2>");
+            i += 1;
+            continue;
+          }
+
+          if (line.startsWith("|") && i + 1 < lines.length && /^\s*\|?[\s:-]+\|/.test(lines[i + 1])) {
+            const header = toCells(lines[i]);
+            i += 2;
+            const rows = [];
+
+            while (i < lines.length && lines[i].trim().startsWith("|")) {
+              rows.push(toCells(lines[i]));
+              i += 1;
+            }
+
+            let html = "<table><thead><tr>";
+            header.forEach(function (h) {
+              html += "<th>" + parseInline(h) + "</th>";
+            });
+            html += "</tr></thead><tbody>";
+
+            rows.forEach(function (r) {
+              html += "<tr>";
+              header.forEach(function (_, idx) {
+                html += "<td>" + parseInline(r[idx] || "") + "</td>";
+              });
+              html += "</tr>";
+            });
+            html += "</tbody></table>";
+            out.push(html);
+            continue;
+          }
+
+          out.push("<p>" + parseInline(line) + "</p>");
+          i += 1;
         }
-        prevElement = prevElement.previousElementSibling;
-      }
 
-      // ヘッダー行から「ジャンル」列のインデックスを取得
-      const headers = table.querySelectorAll("thead th");
-      let genreColIndex = -1;
-      headers.forEach((th, idx) => {
-        if (th.innerText.includes("ジャンル")) {
-          genreColIndex = idx;
+        return out.join("");
+      };
+
+      content.innerHTML = renderMarkdown(markdownSource);
+
+      const floorFromHeading = function (headingText) {
+        if (!headingText) return "all";
+        if (headingText.includes("1F 屋外")) return "1f_out";
+        if (headingText.includes("1F 屋内")) return "1f_in";
+        if (headingText.includes("2F")) return "2f";
+        if (headingText.includes("3F") || headingText.includes("議場")) return "3f";
+        if (headingText.includes("市民ホール")) return "hall";
+        if (headingText.includes("別日程") || headingText.includes("サテライト")) return "other";
+        return "all";
+      };
+
+      const findNearestHeading = function (table) {
+        let node = table.previousElementSibling;
+        while (node) {
+          if (node.tagName === "H3" || node.tagName === "H2") return node;
+          node = node.previousElementSibling;
+        }
+        return null;
+      };
+
+      const tables = Array.from(content.querySelectorAll("table"));
+      const genreSet = new Set();
+      let totalRows = 0;
+
+      tables.forEach(function (table, index) {
+        const heading = findNearestHeading(table);
+        const headingText = heading ? heading.innerText.trim() : "イベント一覧";
+        const area = floorFromHeading(headingText);
+
+        table.dataset.area = area;
+        table.dataset.heading = headingText;
+        table.dataset.tableIndex = String(index + 1);
+
+        const headers = Array.from(table.querySelectorAll("thead th"));
+        let genreIdx = -1;
+        headers.forEach(function (th, i) {
+          if (th.innerText.includes("ジャンル")) genreIdx = i;
+        });
+
+        table.dataset.genreColIndex = String(genreIdx);
+
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        totalRows += rows.length;
+
+        rows.forEach(function (row) {
+          if (genreIdx >= 0 && row.cells[genreIdx]) {
+            const raw = row.cells[genreIdx].innerText;
+            const parts = raw.split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+            if (parts.length > 0) {
+              row.cells[genreIdx].innerHTML = parts.map(function (g) {
+                genreSet.add(g);
+                return "<span class=\"genre-tag\">" + g + "</span>";
+              }).join("");
+            }
+          }
+        });
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "table-wrapper";
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+
+        const block = document.createElement("section");
+        block.className = "table-block";
+        wrapper.parentNode.insertBefore(block, wrapper);
+        block.appendChild(wrapper);
+
+        const cap = document.createElement("div");
+        cap.className = "table-caption";
+        cap.innerHTML = "<span>" + headingText + "</span><span>" + rows.length + "件</span>";
+        block.insertBefore(cap, wrapper);
+
+        block.dataset.linkedHeadingId = "";
+        if (heading) {
+          if (!heading.id) heading.id = "heading-" + (index + 1);
+          block.dataset.linkedHeadingId = heading.id;
         }
       });
 
-      let tableHasVisibleRows = false;
-      const rows = table.querySelectorAll("tbody tr");
+      statTotal.textContent = "総件数: " + totalRows;
 
-      rows.forEach(row => {
-        const rowText = row.innerText.toLowerCase();
-        const rowGenre = genreColIndex !== -1 ? row.cells[genreColIndex].innerText : "";
-
-        // 絞り込み条件の判定
-        const matchFloor = (floorVal === "all") || (areaContext === floorVal);
-        const matchGenre = (genreVal === "all") || (rowGenre.includes(genreVal));
-        const matchText = (textVal === "") || (rowText.includes(textVal));
-
-        if (matchFloor && matchGenre && matchText) {
-          row.style.display = ""; // 表示
-          tableHasVisibleRows = true;
-          totalVisibleRows++;
-        } else {
-          row.style.display = "none"; // 非表示
-        }
+      Array.from(genreSet).sort().forEach(function (genre) {
+        const opt = document.createElement("option");
+        opt.value = genre;
+        opt.textContent = genre;
+        filterGenre.appendChild(opt);
       });
 
-      // テーブル内の全行が非表示になった場合、テーブル全体と直前の見出しも隠す
-      const wrapper = table.closest('.table-wrapper');
-      let targetHeading = wrapper.previousElementSibling;
-      
-      if (!tableHasVisibleRows) {
-        wrapper.style.display = "none";
-        if (targetHeading && (targetHeading.tagName === "H3" || targetHeading.tagName === "H2")) {
-          targetHeading.style.display = "none";
-        }
-      } else {
-        wrapper.style.display = "block";
-        if (targetHeading && (targetHeading.tagName === "H3" || targetHeading.tagName === "H2")) {
-          targetHeading.style.display = "block";
-        }
-      }
+      const performSearch = function () {
+        const floorVal = filterFloor.value;
+        const genreVal = filterGenre.value;
+        const textVal = filterText.value.trim().toLowerCase();
+
+        let visibleRows = 0;
+        let visibleTables = 0;
+
+        tables.forEach(function (table) {
+          const area = table.dataset.area || "all";
+          const genreIdx = Number(table.dataset.genreColIndex || "-1");
+          const block = table.closest(".table-block");
+          const heading = (block && block.dataset.linkedHeadingId) ? document.getElementById(block.dataset.linkedHeadingId) : null;
+          const rows = Array.from(table.querySelectorAll("tbody tr"));
+
+          let hasVisible = false;
+
+          rows.forEach(function (row) {
+            const rowText = row.innerText.toLowerCase();
+            const rawGenre = (genreIdx >= 0 && row.cells[genreIdx]) ? row.cells[genreIdx].innerText : "";
+
+            const matchFloor = floorVal === "all" || area === floorVal;
+            const matchGenre = genreVal === "all" || rawGenre.includes(genreVal);
+            const matchText = textVal === "" || rowText.includes(textVal);
+
+            if (matchFloor && matchGenre && matchText) {
+              row.style.display = "";
+              hasVisible = true;
+              visibleRows += 1;
+            } else {
+              row.style.display = "none";
+            }
+          });
+
+          if (block) block.style.display = hasVisible ? "" : "none";
+          if (heading) heading.style.display = hasVisible ? "" : "none";
+
+          if (hasVisible) visibleTables += 1;
+        });
+
+        statVisible.textContent = "表示件数: " + visibleRows;
+        statTables.textContent = "表示テーブル: " + visibleTables;
+        noResults.style.display = visibleRows === 0 ? "block" : "none";
+      };
+
+      resetBtn.addEventListener("click", function () {
+        filterFloor.value = "all";
+        filterGenre.value = "all";
+        filterText.value = "";
+        performSearch();
+      });
+
+      searchBtn.addEventListener("click", performSearch);
+      filterFloor.addEventListener("change", performSearch);
+      filterGenre.addEventListener("change", performSearch);
+      filterText.addEventListener("input", performSearch);
+
+      performSearch();
     });
-
-    // 検索結果が0件の場合のメッセージ表示
-    if (totalVisibleRows === 0) {
-      noResultsMsg.style.display = "block";
-    } else {
-      noResultsMsg.style.display = "none";
-    }
-  }
-
-  // 入力や選択が変わるたびに検索を実行
-  filterFloor.addEventListener("change", performSearch);
-  filterGenre.addEventListener("change", performSearch);
-  filterText.addEventListener("input", performSearch);
-});
-</script>
+  </script>
+</body>
+</html>
