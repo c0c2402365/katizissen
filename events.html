@@ -3,6 +3,46 @@
 2025年度に開催された「まちカフェ！」の出展団体およびイベントの一覧です。
 会場別・日時別にまとめています。お目当てのブースやイベントをチェックしてみましょう！
 
+<!-- ▼ 検索機能エリア ▼ -->
+<div class="search-container">
+  <h3>🔍 イベント・ブースを探す</h3>
+  <div class="search-filters">
+    <div class="search-group">
+      <label>🏢 階層・エリアで絞り込む</label>
+      <select id="filter-floor">
+        <option value="all">すべてのエリア</option>
+        <option value="1f_out">1F 屋外（マルシェ・広場）</option>
+        <option value="1f_in">1F 屋内（みんなの広場・ワンストップ）</option>
+        <option value="2f">2F（おうえんルーム・会議室など）</option>
+        <option value="3f">3F（アトリウム・議場・会議室など）</option>
+        <option value="hall">市民ホール</option>
+        <option value="other">別日程・サテライト会場</option>
+      </select>
+    </div>
+    <div class="search-group">
+      <label>🏷️ ジャンルで絞り込む</label>
+      <select id="filter-genre">
+        <option value="all">すべてのジャンル</option>
+        <option value="体験">体験・ワークショップ</option>
+        <option value="展示">展示</option>
+        <option value="販売">物販・飲食販売</option>
+        <option value="子ども">子ども向け</option>
+        <option value="相談">相談会</option>
+        <option value="演奏">演奏・パフォーマンス</option>
+        <option value="講演">講演・上映会</option>
+      </select>
+    </div>
+    <div class="search-group">
+      <label>✏️ フリーワード検索</label>
+      <input type="text" id="filter-text" placeholder="団体名やキーワードを入力...">
+    </div>
+  </div>
+</div>
+
+<div id="no-results">
+  該当するイベント・ブースが見つかりませんでした。<br>検索条件を変更してお試しください。
+</div>
+
 ---
 
 ## 📅 11月29日(土) メインイベント（市庁舎会場）
@@ -218,3 +258,109 @@
 | 12月06日(土) | コレクティブハウス本町田 | 【本町田】居住者が語る〈つながる暮らし〉 | 講演 |
 | 12月06日(土) | アムネスティ町田グループ | 【市民ホール】多民族、多文化社会で生きる | 講演 |
 | 12月13日(土) | いざ！鎌倉古道の会 | 【町田市内】歴史街道のまち・町田を歩こう！ | 体験 |
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const filterFloor = document.getElementById("filter-floor");
+  const filterGenre = document.getElementById("filter-genre");
+  const filterText = document.getElementById("filter-text");
+  const noResultsMsg = document.getElementById("no-results");
+
+  // Markdownが生成したテーブルをスマホで横スクロール可能にするラッパーを追加
+  const tables = document.querySelectorAll(".event-page-container table");
+  tables.forEach(table => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "table-wrapper";
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+
+  function performSearch() {
+    const floorVal = filterFloor.value;
+    const genreVal = filterGenre.value;
+    const textVal = filterText.value.toLowerCase();
+
+    let totalVisibleRows = 0;
+
+    tables.forEach(table => {
+      // 直前の見出し(h3/h2)から階層エリアを判定
+      let prevElement = table.closest('.table-wrapper').previousElementSibling;
+      let areaContext = "all";
+      
+      while(prevElement) {
+        if (prevElement.tagName === "H3" || prevElement.tagName === "H2") {
+          const headingText = prevElement.innerText;
+          if (headingText.includes("1F 屋外")) areaContext = "1f_out";
+          else if (headingText.includes("1F 屋内")) areaContext = "1f_in";
+          else if (headingText.includes("2F")) areaContext = "2f";
+          else if (headingText.includes("3F") || headingText.includes("議場")) areaContext = "3f";
+          else if (headingText.includes("市民ホール")) areaContext = "hall";
+          else if (headingText.includes("別日程") || headingText.includes("サテライト")) areaContext = "other";
+          break;
+        }
+        prevElement = prevElement.previousElementSibling;
+      }
+
+      // ヘッダー行から「ジャンル」列のインデックスを取得
+      const headers = table.querySelectorAll("thead th");
+      let genreColIndex = -1;
+      headers.forEach((th, idx) => {
+        if (th.innerText.includes("ジャンル")) {
+          genreColIndex = idx;
+        }
+      });
+
+      let tableHasVisibleRows = false;
+      const rows = table.querySelectorAll("tbody tr");
+
+      rows.forEach(row => {
+        const rowText = row.innerText.toLowerCase();
+        const rowGenre = genreColIndex !== -1 ? row.cells[genreColIndex].innerText : "";
+
+        // 絞り込み条件の判定
+        const matchFloor = (floorVal === "all") || (areaContext === floorVal);
+        const matchGenre = (genreVal === "all") || (rowGenre.includes(genreVal));
+        const matchText = (textVal === "") || (rowText.includes(textVal));
+
+        if (matchFloor && matchGenre && matchText) {
+          row.style.display = ""; // 表示
+          tableHasVisibleRows = true;
+          totalVisibleRows++;
+        } else {
+          row.style.display = "none"; // 非表示
+        }
+      });
+
+      // テーブル内の全行が非表示になった場合、テーブル全体と直前の見出しも隠す
+      const wrapper = table.closest('.table-wrapper');
+      let targetHeading = wrapper.previousElementSibling;
+      
+      if (!tableHasVisibleRows) {
+        wrapper.style.display = "none";
+        if (targetHeading && (targetHeading.tagName === "H3" || targetHeading.tagName === "H2")) {
+          targetHeading.style.display = "none";
+        }
+      } else {
+        wrapper.style.display = "block";
+        if (targetHeading && (targetHeading.tagName === "H3" || targetHeading.tagName === "H2")) {
+          targetHeading.style.display = "block";
+        }
+      }
+    });
+
+    // 検索結果が0件の場合のメッセージ表示
+    if (totalVisibleRows === 0) {
+      noResultsMsg.style.display = "block";
+    } else {
+      noResultsMsg.style.display = "none";
+    }
+  }
+
+  // 入力や選択が変わるたびに検索を実行
+  filterFloor.addEventListener("change", performSearch);
+  filterGenre.addEventListener("change", performSearch);
+  filterText.addEventListener("input", performSearch);
+});
+</script>
