@@ -1,828 +1,349 @@
-<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>まちカフェ！2025 出展・イベント団体一覧</title>
-  <style>
-    :root {
-      --bg: #f6f8fb;
-      --card: #ffffff;
-      --text: #1f2328;
-      --muted: #59636e;
-      --primary: #1f8f5f;
-      --primary-weak: #e8f7ef;
-      --line: #d0d7de;
-      --head: #f1f8f5;
-      --warning: #fff7ea;
-      --warning-line: #f4b24c;
-      --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
-    }
+<style>
+  /* 全体の見やすさ向上（モダンデザイン） */
+  .event-page-container {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* 戻るボタン */
+  .back-link-container {
+    margin-bottom: 20px;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #f0f4f8;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    border: 1px solid #d0d7de;
+    transition: all 0.2s;
+  }
+  .back-btn:hover {
+    background: #e2e8f0;
+    color: #e67e22;
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  /* 検索ボックスのスタイリング */
+  .search-container {
+    background: #f8f9fa;
+    border: 1px solid #d0d7de;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+  .search-container h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .search-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  .search-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .search-group select,
+  .search-group input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: #fff;
+    transition: border-color 0.2s;
+  }
+  .search-group select:focus,
+  .search-group input:focus {
+    outline: none;
+    border-color: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+  }
 
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.7;
-    }
+  /* テーブルの見やすさ向上 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 30px;
+  }
+  th {
+    background: #27ae60;
+    color: #ffffff;
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #edf2f7;
+    vertical-align: middle;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:hover td {
+    background-color: #f0fdf4;
+  }
+  
+  /* レスポンシブ対応 */
+  .table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+  
+  /* メッセージ類 */
+  #no-results, #loading-msg {
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+  #no-results {
+    display: none;
+    background: #fff3f3;
+    color: #d63031;
+  }
+  #loading-msg {
+    background: #eef2f5;
+    color: #2c3e50;
+  }
 
-    .event-page-container {
-      width: min(1200px, calc(100% - 32px));
-      margin: 20px auto 40px;
-    }
+  .genre-badge {
+    display: inline-block;
+    background: #e67e22;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin: 2px;
+    font-weight: bold;
+  }
+</style>
 
-    .hero {
-      background: linear-gradient(120deg, #1f8f5f 0%, #37a96e 100%);
-      color: #fff;
-      border-radius: 16px;
-      padding: 22px 24px;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-    }
+<div class="event-page-container">
 
-    .hero h1 {
-      margin: 0 0 6px;
-      font-size: clamp(22px, 2.8vw, 32px);
-      line-height: 1.25;
-    }
-
-    .hero p {
-      margin: 0;
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 15px;
-    }
-
-    .toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(246, 248, 251, 0.92);
-      backdrop-filter: blur(5px);
-      padding: 10px 0 12px;
-      margin-bottom: 10px;
-    }
-
-    .toolbar-inner {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .field label {
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .field select,
-    .field input,
-    .btn {
-      width: 100%;
-      min-height: 42px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      padding: 0 12px;
-      font-size: 14px;
-      background: #fff;
-      color: var(--text);
-    }
-
-    .field input::placeholder {
-      color: #8a949e;
-    }
-
-    .btn {
-      cursor: pointer;
-      font-weight: 700;
-      border: 1px solid var(--line);
-      background: #fff;
-    }
-
-    .btn:hover {
-      background: #f3f4f6;
-    }
-
-    .btn.primary {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    .btn.primary:hover {
-      filter: brightness(0.95);
-    }
-
-    .toolbar-actions {
-      display: flex;
-      gap: 8px;
-      align-items: end;
-    }
-
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .chip {
-      background: var(--primary-weak);
-      color: #0d683f;
-      border: 1px solid #b6e2c8;
-      border-radius: 999px;
-      padding: 5px 10px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    #no-results {
-      display: none;
-      background: var(--warning);
-      border-left: 4px solid var(--warning-line);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      color: #6f4b00;
-      font-weight: 600;
-    }
-
-    #content {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-    }
-
-    #content h2,
-    #content h3 {
-      margin-top: 1.2em;
-      margin-bottom: 0.5em;
-      line-height: 1.35;
-    }
-
-    #content h2 {
-      border-left: 5px solid var(--primary);
-      padding-left: 10px;
-      font-size: clamp(20px, 2vw, 26px);
-      background: #f7fdf9;
-      border-radius: 6px;
-      padding-top: 8px;
-      padding-bottom: 8px;
-    }
-
-    #content h3 {
-      color: #1b4f35;
-      font-size: clamp(16px, 1.6vw, 20px);
-    }
-
-    .table-block {
-      margin: 12px 0 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .table-caption {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      background: #f9fbfd;
-      border-bottom: 1px solid var(--line);
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 640px;
-    }
-
-    thead th {
-      position: sticky;
-      top: 0;
-      background: var(--head);
-      color: #143524;
-      z-index: 1;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    th,
-    td {
-      border: 1px solid var(--line);
-      padding: 8px 10px;
-      vertical-align: top;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    tbody tr:nth-child(even) {
-      background: #fafbfc;
-    }
-
-    tbody tr:hover {
-      background: #eef8f2;
-    }
-
-    .genre-tag {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid #c6d6e5;
-      background: #f7fbff;
-      color: #23445f;
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 12px;
-      margin-right: 4px;
-      margin-bottom: 3px;
-      line-height: 1.4;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 980px) {
-      .toolbar-inner {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 640px) {
-      .event-page-container {
-        width: calc(100% - 16px);
-        margin-top: 10px;
-      }
-
-      .hero {
-        border-radius: 12px;
-        padding: 16px;
-      }
-
-      .toolbar-inner {
-        grid-template-columns: 1fr;
-        border-radius: 12px;
-      }
-
-      #content {
-        padding: 12px;
-      }
-
-      th,
-      td {
-        font-size: 13px;
-        padding: 7px 8px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="event-page-container">
-    <header class="hero">
-      <h1>🎪 まちカフェ！2025 出展・イベント団体一覧</h1>
-      <p>会場別・日時別にイベント情報を整理しています。検索・絞り込みで目的の団体やブースをすぐ見つけられます。</p>
-    </header>
-
-    <section class="toolbar" aria-label="検索と絞り込み">
-      <div class="toolbar-inner">
-        <div class="field">
-          <label for="filter-floor">🏢 階層・エリア</label>
-          <select id="filter-floor">
-            <option value="all">すべてのエリア</option>
-            <option value="1f_out">1F 屋外（マルシェ・広場）</option>
-            <option value="1f_in">1F 屋内（みんなの広場・ワンストップ）</option>
-            <option value="2f">2F（おうえんルーム・会議室など）</option>
-            <option value="3f">3F（アトリウム・議場・会議室など）</option>
-            <option value="hall">市民ホール</option>
-            <option value="other">別日程・サテライト会場</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="filter-genre">🏷️ ジャンル</label>
-          <select id="filter-genre">
-            <option value="all">すべてのジャンル</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="filter-text">✏️ フリーワード</label>
-          <input id="filter-text" type="text" placeholder="団体名やキーワードを入力">
-        </div>
-
-        <div class="toolbar-actions">
-          <button id="reset-btn" class="btn" type="button">条件をクリア</button>
-          <button id="search-btn" class="btn primary" type="button">検索</button>
-        </div>
-      </div>
-    </section>
-
-    <div class="stats">
-      <span class="chip" id="stat-total">総件数: -</span>
-      <span class="chip" id="stat-visible">表示件数: -</span>
-      <span class="chip" id="stat-tables">表示テーブル: -</span>
-    </div>
-
-    <div id="no-results">該当するイベント・ブースが見つかりませんでした。条件を変更してお試しください。</div>
-    <main id="content" aria-live="polite"></main>
+  <div class="back-link-container">
+    <a href="index.html" class="back-btn">
+      <span>⬅</span> マップ（トップページ）へ戻る
+    </a>
   </div>
 
-  <script id="events-markdown" type="text/plain">
-2025年度に開催された「まちカフェ！」の出展団体およびイベントの一覧です。
-会場別・日時別にまとめています。お目当てのブースやイベントをチェックしてみましょう！
-
----
-
-## 📅 11月29日(土) メインイベント（市庁舎会場）
-
-### 📍 市庁舎 1F 屋外マルシェ
-屋外で賑やかに物販や展示、体験ワークショップが行われます。
-
-| 団体・ブース名 | 出展・イベント内容 | ジャンル |
-| :--- | :--- | :--- |
-| まちだ福祉○ごとサポートセンター | 知ってますか？「地域福祉コーディネーター」 | 展示 |
-| NPO法人 太陽の村 | 子ども達が作った、アイロンビーズ作品を販売します。 | 子ども向け, 販売 |
-| NPO法人 まなクロ | まなクロ miniマーケット | 子ども向け, 販売 |
-| NPO法人ゆどうふ | ハンドクラフト作品の販売とくじ引き | 子ども向け, 販売 |
-| たまぼら・佐野川プロジェクト | 学生によるお茶試飲・販売 | 販売 |
-| 学生団体そよかぜ | 能登うまいもん商店 | 販売 |
-| みんなの居場所「ぬくぬく」 | コーヒー販売、似顔絵描き | 体験, 販売 |
-| 自然派くらぶ生活協同組合 | くらしを支える食のネットワーク（自然派くらぶ生協） | 展示, 販売 |
-| 町田いぬねこ守り手ネットワーク | くつ下で犬や猫を作ってみよう！ | 体験, 販売 |
-| 草木染めを楽しむ会 | 藍染め草木染め展示・即売会 | 展示, 販売 |
-| 経済観光部産業政策課 | 市内事業者と産業政策課の取り組み紹介 | 体験, 展示 |
-| greenbird町田チーム・環境政策課 | greenbird町田チームの取り組み紹介 | 展示 |
-| NPO法人クローバーの会 | クロバーの会福祉バザー | 販売 |
-| NPO法人たがやす | おいしい町田産野菜、陶器、藍染販売 | 展示, 販売 |
-| 社会福祉法人まちのひ 富士作業所 | からだに優しい天然酵母パンを！(ベーカリーひあたり) | 販売 |
-| 多文化クラブDANRO | アフリカ布の作品とチャイの販売 | 販売 |
-| 町田ファーマーズクラブ | 新鮮野菜の販売(町田産) | 販売 |
-| 特定非営利活動法人Yume Iziya | アフリカ学校支援紹介 | 展示, 販売 |
-| MICO LEMONADE | 国産レモンのレモネードを飲んで小児がん支援に繋げよう | 販売 |
-
-### 📍 市庁舎 1F 屋外こもれび広場 / イベントスタジオ / メインステージ
-
-| エリア | 団体・イベント名 | 内容 | ジャンル |
-| :--- | :--- | :--- | :--- |
-| 屋外こもれび広場 | 法政大学 町田法友会 | 法政大学 町田法友会 焼きそば屋台 | 販売 |
-| 屋外こもれび広場 | atelier & cafe bar Hifumi | ほっこりcafeご飯&あったかハンドメイド | 販売 |
-| 屋外こもれび広場 | 13のたね | キッチンカーで美味しい食べ物と飲み物を！ | 販売 |
-| 屋外こもれび広場 | NPO法人 町田ハンディキャブ友の会 | 車いすに乗ってリフトカーを体験しよう！ | 体験, 展示 |
-| イベントスタジオ | 法政大学佐野ゼミ | 風呂敷で広げよう防災の輪 | 展示, 販売 |
-| イベントスタジオ | JSLアミーゴ倶楽部 | 日本手話で語ろう♫ | 体験, 販売 |
-| イベントスタジオ | いざ！鎌倉古道の会 | 「歴史街道のまち・まちだ」を楽しもう！ | 体験, 展示 |
-| イベントスタジオ | 『くじら山』の緑を考える会 | 湧水など身近な自然を再発見 | 展示 |
-| メインステージ | Pop Chorus Cesia | 口笛太郎さんとコラボ演奏！ | 演奏 |
-| メインステージ | 支える手プロジェクト | まちだガールズ・クワイア チャリティーライブ | 演奏 |
-| メインステージ | NPO法人まちだ音の環・和音の木 | ミュージカルレッスンの様子を観て聴いて少し体験しませんか？ | 体験, 子ども, 演奏 |
-| メインステージ | 町田市認知症友の会 | たのしく踊ろうよさこい踊り | 演奏 |
-| メインステージ | 音の旅人尺八の会 | 尺八で聴く日本の名曲・世界の名曲 | 演奏 |
-| メインステージ | タンゴなど世界の音楽を楽しむ会 | アルゼンチンタンゴダンスはいかが？ | 演奏 |
-| メインステージ | 町田ボランティア連絡協議会 | オカリナ＆ピアノ演奏 | 演奏 |
-| メインステージ | 町田市防災アンバサダー | さるびあ亭かーこ紙芝居 | 演奏 |
-| メインステージ | まちだ多様な学び場居場所MAP | 子どもの居場所を考える 〜まちカフェ〜 | 演奏 |
-| メインステージ | 清住平Wind Music | みんなで楽しむミニコンサート | 演奏 |
-| メインステージ | 大♪丈♪夫♪まちだオーケストラ | 愛と平和をお届けするコンサート | 演奏 |
-
-### 📍 市庁舎 1F 屋内（みんなの広場 / ワンストップロビー）
-
-| 団体・イベント名 | 出展・イベント内容 | ジャンル |
-| :--- | :--- | :--- |
-| 町田市認知症友の会 | 認知症の悩みごと相談会・グッズ販売 | 相談会, 販売 |
-| 町田市高齢者支援課・Dフレンズ町田 | 認知症とともに生きるまちを体験しよう！ | 体験, 相談会 |
-| 古本等リサイクル委員会 | 古本をリサイクルしてます！ | 展示, 販売 |
-| NPO法人 町田まちづくり研究所まいんど | 市民が共生するまちづくりを紹介！ | 展示 |
-| NPO法人 氣の活用コム | 心・技・体について実技指導します！ | 体験, 展示 |
-| 暮らしの法律研究会 | 遺産・相続 無料相談会 | 相談会 |
-| 町田ろうなん協会 | 体験してみよう！福祉機器展 | 体験, 展示 |
-| 和光大学 稲田ゼミナール | 謎解きスタンプラリー | 体験 |
-| 町田市社会福祉協議会 福祉サポートまちだ | 市民後見人の活動！紹介します！ | 展示, 相談会 |
-| 町田市社会福祉協議会学童保育クラブ | リサイクル工作 | 体験, 子ども |
-| 地区街づくり課景観3G | 「景観&街」づくりイベントⅢ | 体験, 展示 |
-| まちだサポターズwithスポーツ振興課 | スタンプラリーとボッチャでわくわく体験♡ | 体験 |
-| 狂言講座＆表現の芽をはぐくむ会 | みんなで描く大きな松！ワークショップ | 体験, 展示 |
-| NPO法人町田ヒューマンネットワーク | プチ車いす・介助体験会 | 体験 |
-| まちだポールウォーキングクラブ | ウォーキングで健康寿命を延ばそう | 展示 |
-| めぐみグループ | めぐみフェア | 体験, 相談会 |
-| 中学・高校生の「折り染め先生プロジェクト」 | 中学生や高校生が先生になってみなさんに折り染めを教えます | 体験, 子ども |
-| 一般社団法人 オンラインボッチャ普及協会 | オンラインボッチャ体験会 | 体験 |
-| まちカフェ！ステーション | まちカフェ！スタエフ広場 | 体験, 相談会 |
-| おうちスマホ相談室 | スマホ相談&見直し | 相談会, 販売 |
-| 町田市防災アンバサダー | 防災アンバサダークイズラリー | 体験, 展示 |
-| ゆるっとこども未来まちだ | 市役所に隠された謎解き宝箱を探せ！ | 体験, 子ども |
-| 日本化工機材株式会社 | ロスフラワーを使ってボトルフラワーを作ろう！ | 体験, 販売 |
-| マチダクリップ | ハズレ無し！ガラガラ抽選会！ | 体験 |
-| ELXS合同会社 | 災害・節電対策を始めませんか。 | 展示, 相談会 |
-| ヘアカット専門店ＡＶＡＮＴＩ | ヘアカット専門店町田モディ店の紹介 | 展示 |
-| きらぼし銀行 | きらぼし銀行によるスマホ相談 | 展示, 相談会 |
-| 一般財団法人まちだエコライフ推進公社 | ダンボールコンポスト紹介 粗大ごみ再生販売のPR | 展示, 販売 |
-| アートクロスまちだ | アートクロスまちだ、アートで街歩き！ | 展示, 販売 |
-| N-SET(NEC Space Edication Team) | オリジナルロケットワークショップ | 体験 |
-| SICボランティアスタッフ | 防災ゲーム | 体験, 展示 |
-| 町田emoプロジェクト | プロギングチャレンジ（総合案内所前集合） | 体験 |
-
-### 📍 市庁舎 2F 各スペース
-
-| エリア | 団体・イベント名 | 内容 | ジャンル |
-| :--- | :--- | :--- | :--- |
-| おうえんルーム | 東京都助産師会 町田分会 | 来て、会って、話そう！あなたの町の助産師です。 | 体験, 子ども |
-| おうえんルーム | みんなの居場所「陽だまりカフェ」 | カフェを始めてみませんか？ | 体験, 展示 |
-| おうえんルーム | オンラインサポーターまちだ | 明日からスマホがもっと楽しくなる | 体験, 相談会 |
-| おうえんルーム | ハンドシェイク | ハンドシェイクのプログラム技術整体育成コース体験 | 体験 |
-| おうえんルーム | 脳疲労ケア専門サロン〜KUKUNA〜 | 脳洗浄®頭を揉みほぐして脳疲労ケア | 体験 |
-| おうえんルーム | コレクティブハウス本町田 | コレクティブハウスを知っていますか？ | 展示, 相談会 |
-| 北側廊下 | 第26回まちだ男女平等フェスティバル実行委 | 第26回まちだ男女平等フェスティバル案内 | 展示 |
-| 北側廊下 | 町田かるた協会 | 町田の歴史、文化をかるたで知る | 展示, 販売 |
-| 北側廊下 | NPO法人町田演劇鑑賞会 | 町田市民ホールで演劇を楽しもう！ | 展示 |
-| 北側廊下 | ミニまちだ実行委員会 | お買い物体験！駄菓子屋さん | 子ども, 販売 |
-| 北側廊下 | ワン・ブリッジ町田 | 自分だけの手さげ袋＆小物入れ | 体験, 子ども |
-| 北側廊下 | 町田市印刷工業組合 | メモ帳販売 | 販売 |
-| 北側廊下 | StudioA | あなたの活動を応援する映像制作 | 展示 |
-| 北側廊下 | ライフベターたまり場 | クリスマスツリーを作ろう | 体験, 子ども |
-| キッズスペース | 愛恵会乳児院 CoCoひろば | 赤ちゃんとママのCoCoひろばミニ | 体験, 子ども |
-| キッズスペース | はたつく研究所・ハローワーク町田 | おしごなりきりコーナー！ | 体験, 子ども |
-| 食堂 | 玉川大学リベラルアーツ学部太田ゼミ | 陸前高田物産展 | 販売 |
-| 食堂 | preis | ポップでワタワタでシュワシュワ | 子ども, 販売 |
-| 東側廊下 | 町田市子ども食堂ネットワーク | 子ども食堂の活動の紹介 | 展示, 相談会 |
-| 東側廊下 | 子ども生活部子ども家庭支援課 | 「おうちでごはん」事業の周知 | 展示 |
-| 東側廊下 | 町田児童相談所・子ども家庭支援課 | オレンジリボンの普及啓発 | 子ども, 展示 |
-| 東側廊下 | キーアセット | 新しい家族のかたち「里親制度」をご案内します！ | 展示, 相談会 |
-| 東側廊下 | あなたとアンシンサポート | カードで学ぶ：しごと＊ジブン発見カード | 体験 |
-| 東側廊下 | ホームスタートいずみ | 親子で作るクリスマスオーナメント | 体験, 子ども |
-| 南側廊下 | 鶴川サナトリウム病院 | 覗いてみよう認知症の世界展＋(プラス) | 展示, 相談会 |
-| 南側廊下 | ハローワーク町田 | 未来にハロー！お仕事マッチ大作戦 | 体験, 展示 |
-| 南側廊下 | まちだみどり活用ネットワーク | まちだみどり活用ネットワークって何だろう？ | 体験, 展示 |
-| 南側廊下 | NPO法人 顧問建築家機構 | 安全なすまいとまちを考える！ | 展示, 相談会 |
-| 2-1会議室 | 町田市視覚障害者協会 | みんなの癒やし手 まちのマッサージ / 点字 / アイ碁 | 体験, 相談, 子ども |
-| 2-1会議室 | ブラインドＩＴサポート | 視覚障碍者のためのiPhone教室 | 体験, 相談会 |
-| 2-2会議室 | もこもこフェスティバル | 防犯講座〜私にも出来る安心の”わ”〜 | 講演 |
-| 2-2会議室 | 「あーとde小野路幸詣で」実行委員会 | 体験しよう！気軽に演劇ワークショップ | 体験 |
-| 2-3会議室 | 虹色さざんか | 絵本のひろば | 体験, 展示 |
-| 2-4会議室 | まちだベジハブ（桜美林大学共同） | マインクラフトでまちだの農を体験しよう！ | 体験, 展示 |
-
-### 📍 市庁舎 3F 各スペース ＆ 議場
-
-| エリア | 団体・イベント名 | 内容 | ジャンル |
-| :--- | :--- | :--- | :--- |
-| 3-1会議室 | 認定NPO法人エンディングセンター | 私のエンディング・ウェア発表会 | 体験, 展示 |
-| 3-2会議室 | スヌーズレンブラックライトルームを普及する会 | ブラックライトアート空間を体験！ | 体験, 子ども |
-| 3-3会議室 | ひなた村 出張科学クラブ | 「炭酸水を作ろう！」等 各種科学体験 | 体験, 子ども |
-| 3-3会議室 | 賢治の実験室 | カタクチイワシの胃の中から ギョッ！ | 体験 |
-| 3-3会議室 | 鶴川サイエンスラボ | 「色の見え方マジック」 | 体験, 子ども |
-| 3-3会議室 | 一般社団法人ものづくり文化振興協会 | 楽しいものづくり | 体験, 子ども |
-| アトリウム | きんじょの本棚 / 絲子〜ito.ko〜 | きんじょの本棚 / 本革の革小物作り | 展示, 体験, 販売 |
-| アトリウム | フラワーセラピー研究会 / 文化振興課 | Xmas・お正月飾り作り / 国際交流PR | 体験, 展示, 販売 |
-| アトリウム | 町田リス園 / 町田市赤十字奉仕団 | リスたちの写真展示・販売 / PRブース | 展示, 販売 |
-| アトリウム | アクティブSITA / 文化・国際交流財団 | スマホPC相談・ゲーム / 世界地図で遊ぼう | 体験, 相談, 子ども |
-| アトリウム | 町田やさしい日本語の会 | やさしい日本語クイズ | 体験, 展示 |
-| アトリウム | 町田市町内会・自治会連合会 | 広報紙コンテスト | 子ども, 展示 |
-| アトリウム | 町田市D51型蒸気機関車保存会 | かつての鉄道の担い手ＳＬを知る | 展示 |
-| アトリウム | 能ヶ谷西緑地 樹の会 / こうしん会 | どんぐり遊び・販売 / 彩り文字®でお名前描画 | 体験, 子ども, 販売 |
-| アトリウム | 手話サークルまちだ＆聴覚障害者協会 | 聞こえない人に出会った！その時、君は？ | 体験, 展示 |
-| アトリウム | NPO法人ここからねっと | こころの窓口（無料相談） | 相談会 |
-| 北側廊下 | カワセミサポーターズ / 鶴川冒険あそびの会 | コドマチクエストII / クリスマスリース作り | 体験, 子ども |
-| 北側廊下 | せりがや冒険遊び場 | 冒険遊び場の紹介と小枝で工作！ | 体験, 子ども, 展示 |
-| 西側廊下 | まちだこども選挙実行委 / 町田子ども劇場 | 推し投票！ / えものをねらえ！魚つりゲーム | 体験, 子ども |
-| 西側廊下 | ECOまちダッシュ！ / ウェルビー町田 | アップサイクル工作 / 松ぼっくりゲーム | 体験, 子ども |
-| 西側廊下 | 町田ねこの会 / 相原ガラスフュージング千の花 | まちねこマルシェ / ガラスフュージング販売 | 展示, 販売 |
-| 西側廊下 | 生活支援団体NW / チーム本町田1582 | 地域支援仲間募集 / 本町田行進曲盆踊り紹介 | 展示 |
-| 南側廊下 | まちだ多様な学び場居場所MAP NW | まちだ多様な学び場居場所MAPネットワーク | 展示, 相談会 |
-| 南側廊下 | 玉川大学 芸術学部 地域創生PJ | Museum Goods Project | 体験, 販売 |
-| 南側廊下 | 町田市立博物館 | 学芸員が作品について語ります！ | 体験, 展示 |
-| 議場 | 町田いのちの授業研究会 助産師サークル | 出張！いのちの授業 | 体験, 講演 |
-| 議場 | マチーダ楽団 | ラテンビックバンドを体感しよう！ | 演奏 |
-
-### 📍 市民ホール 会場
-
-| 会場 | 団体・イベント名 | 内容 | ジャンル |
-| :--- | :--- | :--- | :--- |
-| 第1会議室 | 町田で部活 | 大人も部活動のように楽しめる、地域活動を紹介！ | 展示, 相談会 |
-| 第1会議室 | まちだづくりカレッジナリワイ起業チーム | みんなのナリワイ大集合！ | 体験, 展示 |
-| 第2会議室 | シバヨガ | ヨガ・ピラティスで心身を整えよう！ | 体験 |
-| 第3会議室 | NPO法人アートネットまちだ | 想像力を育てる絵本の読み聞かせ | 体験, 講演 |
-| 第3会議室 | NPO町田楽友協会 | ほっこりした時間を！バリアフリーお話と音楽 講演 | 演奏, 講演 |
-| 第4会議室 | 色彩心理グリーンハートラボ | ぬりえの色彩セラピー体験 | 体験 |
-| 第5会議室 | まちいろドロップス | レゴブロックを使って親子でコミュニケーション！ | 体験, 子ども |
-| 第5会議室 | ゆるぼん | まちだ市役所ぐるっと盆おどり | 体験, 演奏 |
-
----
-
-## 📅 別日程・サテライト会場イベント一覧
-
-メイン日程（11月29日）以外、または市庁舎以外の場所で開催される企画です。
-
-| 開催日 | 団体・イベント名 | 会場・内容 | ジャンル |
-| :--- | :--- | :--- | :--- |
-| 11月16日(日) | アートクロスまちだ | 【町田駅周辺】アートツアー「武相の波打ちぎわを歩く」 | 体験 |
-| 11月25日(火) | 高齢者共生の会 | 【成瀬台】認知症セミナー | 講演 |
-| 11月28日(金) | こどレスひろば | 【鶴川】見守り付き親子の居場所 | 子ども, 相談 |
-| 11月29日(土) | ECOまちダッシュ！ | 【町田駅周辺】町田駅周辺ゴミ拾い | 体験 |
-| 11月29日(土) | ディーキャリア町田オフィス | 【同オフィス】障害がある方の「なりたい姿」応援！ | 相談会 |
-| 11月29日〜 | （公社）町田市シルバー人材センター | 【屋外】シルバー人材センター入会相談＆ベジチェック | 相談会 |
-| 11/29-12/6 | みなさんの居場所「ぼくはぼく」 | 【各所】まちカフェ！WEEK2025 | 体験 |
-| 11月30日(日) | 本町田町内会 | 【本町田】関連イベント：本町田芸術祭 | 体験 |
-| 11月30日(日) | NPO法人Yume Iziya | 【鶴川】ジンバブエ学校支援紹介 | 講演, 販売 |
-| 11月30日(日) | 丸山子ども会 | 【子どもセンター】サンタとクリスマス会♪ | 子ども |
-| 12月01日(月) | みなさんの居場所ぼくはぼく | 【同場所】大切な人を亡くされた方のわかちあいの会 | 相談会 |
-| 12月01日(月) | 町田市広報課 | 【市役所】まちだを楽しく語ろうトーク | 体験, 講演 |
-| 12月01日(月) | 町田市障がい福祉課 | 【市役所】みんな笑顔の展覧会/デジタルスポーツ体験 | 展示, 体験 |
-| 12月01日(月) | NPO町田たすけあいワーカーズ | 【市役所】子育て・介護や働く人相談会＆手作り品販売 | 相談会, 販売 |
-| 12月01日(月) | 折り染め先生プロジェクト | 【市役所】不登校経験のある中・高生の作品展示 | 展示 |
-| 12月01日(月) | 子ども広場あそべこどもたち | 【市役所】こんにちは！せりがや冒険遊び場です | 展示 |
-| 12月02日(火) | コーラスサークルアイ | 【玉川学園】エンジョイコーラス 定例会公開見学 | 演奏 |
-| 12月02日(火) | はたつく研究所・ハローワーク | 【市役所】ここちよく暮らし、はたらくを考える座談会 | 相談会 |
-| 12月02日(火) | はたつく研究所・ハローワーク | 【市役所】経験とスキルの棚卸しワークショップ | 体験 |
-| 12月03日(水) | ブラインドITサポート町田 | 【市民フォーラム】視覚障碍者のためのiPhone教室 | 体験, 相談会 |
-| 12月03日(水) | 町田にベイビーシアターを広げる会 | 【市役所】ベイビーシアター | 体験, 子ども |
-| 12月03日(水) | ライフベターたまり場 | 【市民フォーラム】気楽に楽しむ茶の湯体験 | 体験 |
-| 12月03日(水) | まちいろドロップス | 【市役所】「414カード」でゆるっとデスカフェ | 体験, 相談会 |
-| 12月04日(木) | もこもこフェスティバル | 【市役所】子どもを守ろう！ネットリテラシー講座 | 講演 |
-| 12月04日(木) | まちいろドロップス | 【市役所】まちとわたしのゆるトーク | 体験 |
-| 12月05日(金) | 目と心の健康相談室・ユニカール協会 | 【市役所】バリアフリー体験 | 体験 |
-| 12月06日(土) | ECOまちダッシュ！ | 【町田駅周辺】町田駅周辺ゴミ拾い | 体験 |
-| 12月06日(土) | まちだポールウォーキングクラブ | 【シバヒロ】ウォーキングで健康寿命を延ばそう | 体験 |
-| 12月06日(土) | せりがや冒険遊び場 | 【せりがや】キュートでレアなクリスマス飾り作り | 体験, 子ども |
-| 12月06日(土) | 町田ハンディキャブ友の会 | 【原町田】車いすで冒険！原町田七福神めぐり | 体験 |
-| 12月06日(土) | コレクティブハウス本町田 | 【本町田】居住者が語る〈つながる暮らし〉 | 講演 |
-| 12月06日(土) | アムネスティ町田グループ | 【市民ホール】多民族、多文化社会で生きる | 講演 |
-| 12月13日(土) | いざ！鎌倉古道の会 | 【町田市内】歴史街道のまち・町田を歩こう！ | 体験 |
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const content = document.getElementById("content");
-      const filterFloor = document.getElementById("filter-floor");
-      const filterGenre = document.getElementById("filter-genre");
-      const filterText = document.getElementById("filter-text");
-      const resetBtn = document.getElementById("reset-btn");
-      const searchBtn = document.getElementById("search-btn");
-      const noResults = document.getElementById("no-results");
-      const statTotal = document.getElementById("stat-total");
-      const statVisible = document.getElementById("stat-visible");
-      const statTables = document.getElementById("stat-tables");
-
-      const markdownSource = document.getElementById("events-markdown").textContent.trim();
-
-      const esc = function (s) {
-        return s
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
-      };
-
-      const parseInline = function (s) {
-        return esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-      };
-
-      const renderMarkdown = function (md) {
-        const lines = md.replace(/\r/g, "").split("\n");
-        const out = [];
-        let i = 0;
-
-        const toCells = function (line) {
-          return line
-            .trim()
-            .replace(/^\|/, "")
-            .replace(/\|$/, "")
-            .split("|")
-            .map(function (x) { return x.trim(); });
-        };
-
-        while (i < lines.length) {
-          const line = lines[i].trim();
-
-          if (!line) {
-            i += 1;
-            continue;
-          }
-
-          if (line === "---") {
-            out.push("<hr>");
-            i += 1;
-            continue;
-          }
-
-          if (line.startsWith("### ")) {
-            out.push("<h3>" + parseInline(line.slice(4)) + "</h3>");
-            i += 1;
-            continue;
-          }
-
-          if (line.startsWith("## ")) {
-            out.push("<h2>" + parseInline(line.slice(3)) + "</h2>");
-            i += 1;
-            continue;
-          }
-
-          if (line.startsWith("|") && i + 1 < lines.length && /^\s*\|?[\s:-]+\|/.test(lines[i + 1])) {
-            const header = toCells(lines[i]);
-            i += 2;
-            const rows = [];
-
-            while (i < lines.length && lines[i].trim().startsWith("|")) {
-              rows.push(toCells(lines[i]));
-              i += 1;
-            }
-
-            let html = "<table><thead><tr>";
-            header.forEach(function (h) {
-              html += "<th>" + parseInline(h) + "</th>";
-            });
-            html += "</tr></thead><tbody>";
-
-            rows.forEach(function (r) {
-              html += "<tr>";
-              header.forEach(function (_, idx) {
-                html += "<td>" + parseInline(r[idx] || "") + "</td>";
-              });
-              html += "</tr>";
-            });
-            html += "</tbody></table>";
-            out.push(html);
-            continue;
-          }
-
-          out.push("<p>" + parseInline(line) + "</p>");
-          i += 1;
-        }
-
-        return out.join("");
-      };
-
-      content.innerHTML = renderMarkdown(markdownSource);
-
-      const floorFromHeading = function (headingText) {
-        if (!headingText) return "all";
-        if (headingText.includes("1F 屋外")) return "1f_out";
-        if (headingText.includes("1F 屋内")) return "1f_in";
-        if (headingText.includes("2F")) return "2f";
-        if (headingText.includes("3F") || headingText.includes("議場")) return "3f";
-        if (headingText.includes("市民ホール")) return "hall";
-        if (headingText.includes("別日程") || headingText.includes("サテライト")) return "other";
-        return "all";
-      };
-
-      const findNearestHeading = function (table) {
-        let node = table.previousElementSibling;
-        while (node) {
-          if (node.tagName === "H3" || node.tagName === "H2") return node;
-          node = node.previousElementSibling;
-        }
-        return null;
-      };
-
-      const tables = Array.from(content.querySelectorAll("table"));
-      const genreSet = new Set();
-      let totalRows = 0;
-
-      tables.forEach(function (table, index) {
-        const heading = findNearestHeading(table);
-        const headingText = heading ? heading.innerText.trim() : "イベント一覧";
-        const area = floorFromHeading(headingText);
-
-        table.dataset.area = area;
-        table.dataset.heading = headingText;
-        table.dataset.tableIndex = String(index + 1);
-
-        const headers = Array.from(table.querySelectorAll("thead th"));
-        let genreIdx = -1;
-        headers.forEach(function (th, i) {
-          if (th.innerText.includes("ジャンル")) genreIdx = i;
-        });
-
-        table.dataset.genreColIndex = String(genreIdx);
-
-        const rows = Array.from(table.querySelectorAll("tbody tr"));
-        totalRows += rows.length;
-
-        rows.forEach(function (row) {
-          if (genreIdx >= 0 && row.cells[genreIdx]) {
-            const raw = row.cells[genreIdx].innerText;
-            const parts = raw.split(",").map(function (x) { return x.trim(); }).filter(Boolean);
-            if (parts.length > 0) {
-              row.cells[genreIdx].innerHTML = parts.map(function (g) {
-                genreSet.add(g);
-                return "<span class=\"genre-tag\">" + g + "</span>";
-              }).join("");
-            }
-          }
-        });
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "table-wrapper";
-        table.parentNode.insertBefore(wrapper, table);
-        wrapper.appendChild(table);
-
-        const block = document.createElement("section");
-        block.className = "table-block";
-        wrapper.parentNode.insertBefore(block, wrapper);
-        block.appendChild(wrapper);
-
-        const cap = document.createElement("div");
-        cap.className = "table-caption";
-        cap.innerHTML = "<span>" + headingText + "</span><span>" + rows.length + "件</span>";
-        block.insertBefore(cap, wrapper);
-
-        block.dataset.linkedHeadingId = "";
-        if (heading) {
-          if (!heading.id) heading.id = "heading-" + (index + 1);
-          block.dataset.linkedHeadingId = heading.id;
-        }
-      });
-
-      statTotal.textContent = "総件数: " + totalRows;
-
-      Array.from(genreSet).sort().forEach(function (genre) {
-        const opt = document.createElement("option");
-        opt.value = genre;
-        opt.textContent = genre;
-        filterGenre.appendChild(opt);
-      });
-
-      const performSearch = function () {
-        const floorVal = filterFloor.value;
-        const genreVal = filterGenre.value;
-        const textVal = filterText.value.trim().toLowerCase();
-
-        let visibleRows = 0;
-        let visibleTables = 0;
-
-        tables.forEach(function (table) {
-          const area = table.dataset.area || "all";
-          const genreIdx = Number(table.dataset.genreColIndex || "-1");
-          const block = table.closest(".table-block");
-          const heading = (block && block.dataset.linkedHeadingId) ? document.getElementById(block.dataset.linkedHeadingId) : null;
-          const rows = Array.from(table.querySelectorAll("tbody tr"));
-
-          let hasVisible = false;
-
-          rows.forEach(function (row) {
-            const rowText = row.innerText.toLowerCase();
-            const rawGenre = (genreIdx >= 0 && row.cells[genreIdx]) ? row.cells[genreIdx].innerText : "";
-
-            const matchFloor = floorVal === "all" || area === floorVal;
-            const matchGenre = genreVal === "all" || rawGenre.includes(genreVal);
-            const matchText = textVal === "" || rowText.includes(textVal);
-
-            if (matchFloor && matchGenre && matchText) {
-              row.style.display = "";
-              hasVisible = true;
-              visibleRows += 1;
-            } else {
-              row.style.display = "none";
-            }
-          });
-
-          if (block) block.style.display = hasVisible ? "" : "none";
-          if (heading) heading.style.display = hasVisible ? "" : "none";
-
-          if (hasVisible) visibleTables += 1;
-        });
-
-        statVisible.textContent = "表示件数: " + visibleRows;
-        statTables.textContent = "表示テーブル: " + visibleTables;
-        noResults.style.display = visibleRows === 0 ? "block" : "none";
-      };
-
-      resetBtn.addEventListener("click", function () {
-        filterFloor.value = "all";
-        filterGenre.value = "all";
-        filterText.value = "";
-        performSearch();
-      });
-
-      searchBtn.addEventListener("click", performSearch);
-      filterFloor.addEventListener("change", performSearch);
-      filterGenre.addEventListener("change", performSearch);
-      filterText.addEventListener("input", performSearch);
-
-      performSearch();
+  <h1 style="color: #2c3e50; border-bottom: 3px solid #27ae60; padding-bottom: 10px;">🎪 まちカフェ！2025 出展・イベント団体一覧</h1>
+  <p>2025年度に開催された「まちカフェ！」の出展団体およびイベントの一覧です。<br>
+  お目当てのブースやイベントを検索してチェックしてみましょう！</p>
+
+  <div class="search-container">
+    <h3>🔍 イベント・ブースを探す</h3>
+    <div class="search-filters">
+      <div class="search-group">
+        <label>🏢 エリアで絞り込む</label>
+        <select id="filter-area">
+          <option value="all">すべてのエリア</option>
+          </select>
+      </div>
+      <div class="search-group">
+        <label>🏷️ ジャンルで絞り込む</label>
+        <select id="filter-genre">
+          <option value="all">すべてのジャンル</option>
+          </select>
+      </div>
+      <div class="search-group">
+        <label>✏️ フリーワード検索</label>
+        <input type="text" id="filter-text" placeholder="団体名やキーワードを入力...">
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-msg">スプレッドシートから最新データを読み込んでいます... ⏳</div>
+  
+  <div id="no-results">
+    該当するイベント・ブースが見つかりませんでした。<br>検索条件を変更してお試しください。
+  </div>
+
+  <div class="table-wrapper" id="table-container" style="display: none;">
+    <table id="event-table">
+      <thead>
+        <tr>
+          <th style="min-width: 140px;">出展エリア</th>
+          <th style="min-width: 180px;">団体・ブース名</th>
+          <th style="min-width: 250px;">出展・イベント内容</th>
+          <th style="min-width: 120px;">ジャンル</th>
+        </tr>
+      </thead>
+      <tbody id="event-tbody">
+        </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<script>
+  // ★★★ 管理者設定：ここにスプレッドシート（CSV）のURLを貼り付けてください ★★★
+  const csvUrl = '【フォーム1】第20回まちカフェ！参加申込書（回答）.xlsx - フォームの回答 1.csv';
+
+  let allEvents = [];
+
+  document.addEventListener("DOMContentLoaded", function() {
+    loadCSVData();
+    
+    // フィルターの変更を監視
+    document.getElementById("filter-area").addEventListener("change", renderTable);
+    document.getElementById("filter-genre").addEventListener("change", renderTable);
+    document.getElementById("filter-text").addEventListener("input", renderTable);
+  });
+
+  // CSVデータの読み込み
+  function loadCSVData() {
+    if (csvUrl === 'ここに取得したCSVのURLを貼り付けてください' || csvUrl === '') {
+      document.getElementById('loading-msg').innerText = "エラー：CSVのURLが設定されていません。コード内の csvUrl を設定してください。";
+      return;
+    }
+
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        // 空の行を除外して保存
+        allEvents = results.data.filter(row => row['団体名'] && row['団体名'].trim() !== '');
+        
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('table-container').style.display = 'block';
+        
+        setupDynamicFilters();
+        renderTable();
+      },
+      error: function(err) {
+        console.error('CSVの読み込みに失敗しました:', err);
+        document.getElementById('loading-msg').innerText = "データの読み込みに失敗しました。URLが正しいか、公開設定になっているか確認してください。";
+      }
     });
-  </script>
-</body>
-</html>
+  }
+
+  // 読み込んだデータから、エリアとジャンルの選択肢を自動生成する
+  function setupDynamicFilters() {
+    const areaSelect = document.getElementById("filter-area");
+    const genreSelect = document.getElementById("filter-genre");
+    
+    let uniqueAreas = new Set();
+    let uniqueGenres = new Set();
+
+    allEvents.forEach(ev => {
+      if (ev['出展エリア']) uniqueAreas.add(ev['出展エリア'].trim());
+      
+      if (ev['ジャンル']) {
+        // カンマ区切りのジャンルを分割して追加
+        const genres = ev['ジャンル'].split(/[、,]/);
+        genres.forEach(g => {
+          if (g.trim()) uniqueGenres.add(g.trim());
+        });
+      }
+    });
+
+    // エリアの選択肢を追加
+    Array.from(uniqueAreas).sort().forEach(area => {
+      const opt = document.createElement("option");
+      opt.value = area;
+      opt.textContent = area;
+      areaSelect.appendChild(opt);
+    });
+
+    // ジャンルの選択肢を追加
+    Array.from(uniqueGenres).sort().forEach(genre => {
+      const opt = document.createElement("option");
+      opt.value = genre;
+      opt.textContent = genre;
+      genreSelect.appendChild(opt);
+    });
+  }
+
+  // テーブルの描画と絞り込み
+  function renderTable() {
+    const tbody = document.getElementById("event-tbody");
+    const noResultsMsg = document.getElementById("no-results");
+    
+    // 検索条件の取得
+    const filterArea = document.getElementById("filter-area").value;
+    const filterGenre = document.getElementById("filter-genre").value;
+    const filterText = document.getElementById("filter-text").value.toLowerCase();
+
+    tbody.innerHTML = "";
+    let visibleCount = 0;
+
+    allEvents.forEach(ev => {
+      const area = (ev['出展エリア'] || "").trim();
+      const name = (ev['団体名'] || "").trim();
+      const content = (ev['出展内容'] || "").trim();
+      const genre = (ev['ジャンル'] || "").trim();
+
+      // 絞り込み判定
+      const matchArea = (filterArea === "all") || (area === filterArea);
+      const matchGenre = (filterGenre === "all") || (genre.includes(filterGenre));
+      const matchText = (filterText === "") || 
+                        (name.toLowerCase().includes(filterText) || 
+                         content.toLowerCase().includes(filterText) || 
+                         area.toLowerCase().includes(filterText));
+
+      if (matchArea && matchGenre && matchText) {
+        visibleCount++;
+        
+        const tr = document.createElement("tr");
+        
+        // ジャンルのバッジ（ラベル）化
+        let genreHtml = "";
+        if (genre) {
+          const genreArray = genre.split(/[、,]/);
+          genreArray.forEach(g => {
+            if(g.trim()) genreHtml += `<span class="genre-badge">${g.trim()}</span>`;
+          });
+        }
+
+        tr.innerHTML = `
+          <td><strong style="color: #2980b9;">${area}</strong></td>
+          <td style="font-weight: bold;">${name}</td>
+          <td>${content}</td>
+          <td>${genreHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    });
+
+    // 結果が0件の場合
+    if (visibleCount === 0) {
+      document.getElementById('table-container').style.display = 'none';
+      noResultsMsg.style.display = "block";
+    } else {
+      document.getElementById('table-container').style.display = 'block';
+      noResultsMsg.style.display = "none";
+    }
+  }
+</script>
