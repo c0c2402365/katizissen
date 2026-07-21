@@ -209,7 +209,7 @@
 
 <script>
   // ★★★ 管理者設定：ここにスプレッドシート（CSV）のURLを貼り付けてください ★★★
-  const csvUrl = '【フォーム1】第20回まちカフェ！参加申込書（回答）.xlsx - フォームの回答 1.csv';
+  const csvUrl = '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv';
 
   let allEvents = [];
 
@@ -224,7 +224,7 @@
 
   // CSVデータの読み込み
   function loadCSVData() {
-    if (csvUrl === '【フォーム1】第20回まちカフェ！参加申込書（回答）.xlsx - フォームの回答 1.csv' || csvUrl === '') {
+    if (csvUrl === '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv' || csvUrl === '') {
       document.getElementById('loading-msg').innerText = "エラー：CSVのURLが設定されていません。コード内の csvUrl を設定してください。";
       return;
     }
