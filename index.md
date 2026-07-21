@@ -1,6 +1,6 @@
 <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 14px 18px; border-radius: 8px; border: 1px solid #d0d7de; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
   <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">📍 会場マップナビゲーション</span>
-  <a href="events.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #27ae60; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+  <a href="events.md" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #27ae60; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
     <span>📅</span> イベントプログラム・出展一覧はこちら ➔
   </a>
 </div>
@@ -82,17 +82,23 @@
 
 <div id="floor-pin-info" style="margin-top: 20px; padding: 15px 18px; background: #fffcf5; border-left: 5px solid #e67e22; border-radius: 6px; display: none;">
   <strong id="info-title" style="color: #d35400; font-size: 18px; display: block;"></strong>
-  <p id="info-desc" style="margin: 8px 0 0 0; font-size: 15px; color: #333; line-height: 1.6;"></p>
+  <div id="info-desc" style="margin: 8px 0 0 0; font-size: 14px; color: #333; line-height: 1.6;"></div>
 </div>
+
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <script>
+  // ★★★ 管理者設定：ここにスプレッドシート（CSV）のURLを貼り付けてください ★★★
+  const csvUrl = 'ここに取得したCSVのURLを貼り付けてください';
+
   const defaultCoords = [35.545199, 139.442838];
   let map;
   let markerGroup;
   let leafletMarkers = {}; 
+  let fetchedEvents = {}; // スプレッドシートから読み込んだデータを格納
 
   const floorImgMap = {
     'all': 'all_img',
@@ -120,7 +126,6 @@
   document.addEventListener("DOMContentLoaded", function() {
     map = L.map('event-map').setView(defaultCoords, 17);
     
-    // ▼ 修正: detectRetina を true にして、拡大時の地図文字を相対的に小さく高精細に表示
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       detectRetina: true
@@ -129,15 +134,48 @@
     markerGroup = L.layerGroup().addTo(map);
     showFloorPins('all');
     renderImagePins();
+    
+    // スプレッドシート（CSV）の読み込みを実行
+    loadCSVData();
   });
 
-  // ドロップダウン：フロア変更時
+  // ▼ PapaParseを使ってスプレッドシート（CSV）を読み込む
+  function loadCSVData() {
+    if (csvUrl === 'ここに取得したCSVのURLを貼り付けてください' || csvUrl === '') {
+      console.log('CSVのURLがまだ設定されていません。固定データを表示します。');
+      return;
+    }
+    
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const data = results.data;
+        data.forEach(row => {
+          const area = row['出展エリア'];
+          if (area) {
+            if (!fetchedEvents[area]) {
+              fetchedEvents[area] = [];
+            }
+            fetchedEvents[area].push({
+              name: row['団体名'],
+              content: row['出展内容'],
+              genre: row['ジャンル']
+            });
+          }
+        });
+      },
+      error: function(err) {
+        console.error('CSVの読み込みに失敗しました:', err);
+      }
+    });
+  }
+
   function onFloorSelectChange(floorId) {
     const imgId = floorImgMap[floorId] || 'all_img';
     switchFloorMap(floorId, imgId, true);
   }
 
-  // ドロップダウン：エリア変更時
   function onAreaSelectChange(pinId) {
     if (!pinId) return;
     const pin = pinData.find(p => p.id == pinId);
@@ -146,9 +184,7 @@
     }
   }
 
-  // ボタンやドロップダウンからのフロア切替
   function switchFloorMap(floorId, imgId, isFromDropdown = false) {
-    // ボタン表示同期
     const buttons = document.getElementsByClassName('floor-btn');
     for (let btn of buttons) {
       btn.classList.remove('active');
@@ -156,25 +192,18 @@
         btn.classList.add('active');
       }
     }
-
-    // フロアドロップダウン同期
     if (!isFromDropdown) {
       document.getElementById('floor-select').value = floorId;
     }
-
-    // エリアドロップダウン更新
     updateAreaSelectDropdown(floorId);
-
     showFloorPins(floorId);
     changeFloorImage(imgId);
-
     document.getElementById('floor-pin-info').style.display = 'none';
   }
 
   function updateAreaSelectDropdown(floorId) {
     const areaSelect = document.getElementById('area-select');
     areaSelect.innerHTML = '';
-
     if (floorId === 'all') {
       areaSelect.innerHTML = '<option value="">フロアを先に選択してください</option>';
       areaSelect.disabled = true;
@@ -195,19 +224,40 @@
     }
   }
 
+  // ▼ ピンが選択されたときに、CSVのデータを使って詳細情報を生成する
   function triggerPinSelection(pin) {
     changeFloorImage(pin.img);
     highlightImagePin(pin.id);
 
-    // 情報カード表示
+    // エリア名を表示
     document.getElementById('info-title').innerText = pin.name;
-    document.getElementById('info-desc').innerText = pin.desc;
+    
+    // 基本説明テキスト（固定データ）
+    let descHtml = `<p style="margin: 5px 0 10px 0; font-size: 13px; color: #555;">${pin.desc}</p>`;
+    
+    // スプレッドシートから読み込んだ出展団体リストがあれば追記
+    if (fetchedEvents[pin.name] && fetchedEvents[pin.name].length > 0) {
+      descHtml += `<div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 12px;">`;
+      descHtml += `<strong style="font-size: 15px; color: #2c3e50;">📋 出展・イベント一覧</strong>`;
+      descHtml += `<ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 14px; color: #333;">`;
+      
+      fetchedEvents[pin.name].forEach(ev => {
+        const genreBadge = ev.genre ? `<span style="font-size: 11px; color: #fff; background: #27ae60; padding: 2px 6px; border-radius: 10px; margin-left: 6px; vertical-align: middle;">${ev.genre}</span>` : '';
+        descHtml += `<li style="margin-bottom: 10px;">
+                       <b style="color:#d35400;">${ev.name || '名称不明'}</b> ${genreBadge}<br>
+                       <span style="color: #444; font-size: 13px;">${ev.content || ''}</span>
+                     </li>`;
+      });
+      descHtml += `</ul></div>`;
+    } else if (csvUrl !== '【フォーム1】第20回まちカフェ！参加申込書（回答）.xlsx - フォームの回答 1.csv') {
+      descHtml += `<div style="margin-top: 10px; font-size: 13px; color: #888;">（現在このエリアの出展情報はありません）</div>`;
+    }
+
+    document.getElementById('info-desc').innerHTML = descHtml;
     document.getElementById('floor-pin-info').style.display = 'block';
 
-    // エリアドロップダウン選択肢を同期
     document.getElementById('area-select').value = pin.id;
 
-    // 地図ポップアップ＆中央移動
     if (leafletMarkers[pin.id]) {
       leafletMarkers[pin.id].openPopup();
       map.panTo(pin.coords);
@@ -217,7 +267,6 @@
   function changeFloorImage(imgId) {
     const imgContents = document.getElementsByClassName('floor-img-content');
     for (let img of imgContents) { img.style.display = 'none'; }
-    
     const targetImg = document.getElementById(imgId);
     if (targetImg) {
       targetImg.style.display = (imgId === 'all_img') ? 'block' : 'inline-block';
@@ -231,8 +280,6 @@
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
-        
-        // ▼ 修正: ポップアップ内の文字サイズを小さく調整 (13px / 12px)
         marker.bindPopup(`<b style="font-size: 13px;">${pin.name}</b><br><span style="font-size:12px; color:#555; line-height: 1.4; display: inline-block; margin-top: 4px;">${pin.desc}</span>`);
         
         marker.on('click', function() {
@@ -286,7 +333,6 @@
 </script>
 
 <style>
-  /* ▼ 修正: マップ上のピン画像の不要な背景・枠線（MarkdownのCSS競合）を強制的に透明化リセット */
   .leaflet-marker-icon,
   .leaflet-marker-shadow {
     background: transparent !important;
@@ -320,7 +366,6 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    /* ▼ 修正: フロアマップ側の丸ピンも少し透明度を持たせる (rgbaでアルファ値を設定) */
     background-color: rgba(255, 59, 48, 0.85);
     border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 50%;
