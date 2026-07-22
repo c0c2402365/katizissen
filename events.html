@@ -5,21 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>イベント情報</title>
     <style>
-        /* 全体のフォントと背景色 */
+        /* 全体のフォントと背景色（文字サイズを +5pt 拡大） */
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
             background-color: #f4f7f6;
             color: #333;
             margin: 0;
             padding: 20px;
+            font-size: 21px; /* デフォルト 16px → 21px (+5pt) */
+            line-height: 1.6;
         }
 
         /* 表を囲むカードデザイン */
         .container {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
             background-color: #ffffff;
-            padding: 30px;
+            padding: 35px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
@@ -27,8 +29,8 @@
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 24px;
+            margin-bottom: 25px;
+            font-size: 29px; /* 24px → 29px (+5pt) */
         }
 
         /* スマホ対応（横スクロール） */
@@ -41,13 +43,14 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px; /* 最低の横幅を確保 */
+            min-width: 650px;
         }
 
         th, td {
-            padding: 12px 15px;
+            padding: 14px 18px;
             text-align: left;
             border-bottom: 1px solid #e0e0e0;
+            font-size: 21px; /* 16px → 21px (+5pt) */
         }
 
         /* 見出し（ヘッダー）のデザイン */
@@ -55,7 +58,7 @@
             background-color: #3498db;
             color: #ffffff;
             font-weight: bold;
-            white-space: nowrap; /* 見出しの折り返しを防ぐ */
+            white-space: nowrap;
         }
 
         /* 偶数行の背景色（ストライプ） */
@@ -69,11 +72,12 @@
             transition: background-color 0.2s ease;
         }
 
-        /* 読み込み中メッセージ */
+        /* 読み込み中・エラーメッセージ */
         .status-message {
             text-align: center;
             color: #7f8c8d;
             padding: 20px;
+            font-size: 21px; /* 16px → 21px (+5pt) */
         }
     </style>
 </head>
@@ -89,8 +93,8 @@
     </div>
 
     <script>
-        // 読み込むCSVファイル名（必要に応じて変更してください）
-        const csvFilePath = '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv';
+        // 読み込むCSVファイル名
+        const csvFilePath = '  1.csv';
 
         fetch(csvFilePath)
             .then(response => {
@@ -100,20 +104,16 @@
                 return response.text();
             })
             .then(csvText => {
-                // 行ごとに分割
                 const rows = csvText.split('\n');
                 let html = '<table>';
 
                 rows.forEach((row, index) => {
-                    // 空行はスキップ
                     if (row.trim() === '') return;
                     
-                    // カンマで分割
                     const columns = row.split(',');
                     html += '<tr>';
                     
                     columns.forEach(column => {
-                        // 文字列の前後の空白や不要な記号を取り除く
                         const text = column.trim().replace(/^"|"$/g, ''); 
                         
                         if (index === 0) {
@@ -128,7 +128,6 @@
 
                 html += '</table>';
                 
-                // HTMLに適用
                 document.getElementById('csv-data-container').innerHTML = html;
             })
             .catch(error => {
