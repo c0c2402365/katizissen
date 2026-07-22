@@ -35,6 +35,29 @@
             font-size: 29px;
         }
 
+        /* 検索ボックスのエリア */
+        .search-container {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 21px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #2980b9;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+        }
+
         /* テーブルの横スクロール対応 */
         .table-responsive {
             width: 100%;
@@ -109,6 +132,11 @@
 
         <h1>イベント一覧</h1>
         
+        <!-- 検索入力エリア -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 団体名・ジャンルなどで検索...">
+        </div>
+
         <!-- 表が生成されるコンテナ -->
         <div class="table-responsive" id="csv-data-container">
             <div class="status-message">データを読み込み中...</div>
@@ -117,7 +145,40 @@
 
     <script>
         const csvFilePath = '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv';
+        let headerRow = [];
+        let bodyRows = [];
 
+        // 表の描画処理
+        function renderTable(filteredRows) {
+            const container = document.getElementById('csv-data-container');
+            
+            if (filteredRows.length === 0) {
+                container.innerHTML = '<div class="status-message">該当するイベントが見つかりませんでした。</div>';
+                return;
+            }
+
+            let html = '<table><thead><tr>';
+            
+            // ヘッダー（見出し）の作成
+            headerRow.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            // データ行の作成
+            filteredRows.forEach(row => {
+                html += '<tr>';
+                row.forEach(col => {
+                    html += `<td>${col}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // CSV取得とデータ保持
         fetch(csvFilePath)
             .then(response => {
                 if (!response.ok) {
@@ -126,37 +187,46 @@
                 return response.text();
             })
             .then(csvText => {
-                const rows = csvText.split('\n');
-                let html = '<table>';
+                const lines = csvText.split('\n');
+                const parsedData = [];
 
-                rows.forEach((row, index) => {
-                    if (row.trim() === '') return;
-                    
-                    const columns = row.split(',');
-                    html += '<tr>';
-                    
-                    columns.forEach(column => {
-                        const text = column.trim().replace(/^"|"$/g, ''); 
-                        
-                        if (index === 0) {
-                            html += `<th>${text}</th>`;
-                        } else {
-                            html += `<td>${text}</td>`;
-                        }
-                    });
-                    
-                    html += '</tr>';
+                lines.forEach((line) => {
+                    if (line.trim() === '') return;
+                    const columns = line.split(',').map(col => col.trim().replace(/^"|"$/g, ''));
+                    parsedData.push(columns);
                 });
 
-                html += '</table>';
-                
-                document.getElementById('csv-data-container').innerHTML = html;
+                if (parsedData.length > 0) {
+                    headerRow = parsedData[0];
+                    bodyRows = parsedData.slice(1);
+                    renderTable(bodyRows);
+                } else {
+                    document.getElementById('csv-data-container').innerHTML = 
+                        '<div class="status-message">データが空です。</div>';
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('csv-data-container').innerHTML = 
                     '<div class="status-message" style="color: #e74c3c;">CSVデータの読み込みに失敗しました。ローカルサーバーで起動しているか確認してください。</div>';
             });
+
+        // リアルタイム検索イベント
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase().trim();
+            
+            if (!keyword) {
+                renderTable(bodyRows);
+                return;
+            }
+
+            // 行内のどこかにキーワードが含まれているものを抽出
+            const filtered = bodyRows.filter(row => {
+                return row.some(cell => cell.toLowerCase().includes(keyword));
+            });
+
+            renderTable(filtered);
+        });
     </script>
 
 </body>
