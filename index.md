@@ -31,7 +31,7 @@
     <div style="flex: 1; min-width: 250px;">
       <label style="font-size: 19px; color: #444; display: block; margin-bottom: 8px; font-weight: bold;">① フロアを選択</label>
       <select id="floor-select" onchange="onFloorSelectChange(this.value)" style="width: 100%; padding: 12px 16px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 21px;">
-        <option value="all">全エリア表示</option>
+        <option value="all">全エリア表示（ピン非表示）</option>
         <option value="1f_out">1F 屋外マルシェ・広場</option>
         <option value="1f_in">1F 屋内（ワンストップ・みんなの広場）</option>
         <option value="2f">2F 会議室・おうえん・キッズスペース</option>
@@ -72,11 +72,10 @@
       <p style="color: #555; margin: 0; font-size: 21px; line-height: 1.6;">
         上の選択メニューまたはボタンから<b>「1F屋内」「2F」「3F」</b>を選択すると、<br>
         ここに詳細なフロアマップ（画像）が表示されます。<br><br>
-        地図や画像のピンからも連動して確認できます！
+        選択されたエリアのみ地図上にピンが表示されます！
       </p>
     </div>
 
-    <!-- 画像の最大幅を画面いっぱいに広がるように 100% に変更 -->
     <div id="floor1_img" class="floor-img-content" style="display: none; position: relative; max-width: 100%; width: 100%;">
       <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
       <div class="inner-pins"></div>
@@ -106,7 +105,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <script>
-  // ★★★ 管理者設定：ここにスプレッドシート（CSV）のURLを貼り付けてください ★★★
   const csvUrl = 'ここに取得したCSVのURLを貼り付けてください';
 
   const defaultCoords = [35.545199, 139.442838];
@@ -147,7 +145,7 @@
     }).addTo(map);
 
     markerGroup = L.layerGroup().addTo(map);
-    showFloorPins('all');
+    showFloorPins('all'); // 初期状態はピン非表示
     renderImagePins();
     
     loadCSVData();
@@ -155,7 +153,6 @@
 
   function loadCSVData() {
     if (csvUrl === 'ここに取得したCSVのURLを貼り付けてください' || csvUrl === '') {
-      console.log('CSVのURLがまだ設定されていません。固定データを表示します。');
       return;
     }
     
@@ -177,9 +174,6 @@
             });
           }
         });
-      },
-      error: function(err) {
-        console.error('CSVの読み込みに失敗しました:', err);
       }
     });
   }
@@ -237,61 +231,20 @@
     }
   }
 
-  function triggerPinSelection(pin) {
-    changeFloorImage(pin.img);
-    highlightImagePin(pin.id);
-
-    document.getElementById('info-title').innerText = pin.name;
-    
-    // 説明文の文字サイズも +5pt
-    let descHtml = `<p style="margin: 8px 0 12px 0; font-size: 18px; color: #555;">${pin.desc}</p>`;
-    
-    if (fetchedEvents[pin.name] && fetchedEvents[pin.name].length > 0) {
-      descHtml += `<div style="margin-top: 18px; border-top: 1px dashed #ccc; padding-top: 15px;">`;
-      descHtml += `<strong style="font-size: 20px; color: #2c3e50;">📋 出展・イベント一覧</strong>`;
-      descHtml += `<ul style="margin: 10px 0 0 0; padding-left: 24px; font-size: 19px; color: #333;">`;
-      
-      fetchedEvents[pin.name].forEach(ev => {
-        const genreBadge = ev.genre ? `<span style="font-size: 16px; color: #fff; background: #27ae60; padding: 3px 8px; border-radius: 12px; margin-left: 8px; vertical-align: middle;">${ev.genre}</span>` : '';
-        descHtml += `<li style="margin-bottom: 12px;">
-                       <b style="color:#d35400;">${ev.name || '名称不明'}</b> ${genreBadge}<br>
-                       <span style="color: #444; font-size: 18px;">${ev.content || ''}</span>
-                     </li>`;
-      });
-      descHtml += `</ul></div>`;
-    } else if (csvUrl !== '【フォーム1】第20回まちカフェ！参加申込書（回答）.xlsx - フォームの回答 1.csv') {
-      descHtml += `<div style="margin-top: 12px; font-size: 18px; color: #888;">（現在このエリアの出展情報はありません）</div>`;
-    }
-
-    document.getElementById('info-desc').innerHTML = descHtml;
-    document.getElementById('floor-pin-info').style.display = 'block';
-
-    document.getElementById('area-select').value = pin.id;
-
-    if (leafletMarkers[pin.id]) {
-      leafletMarkers[pin.id].openPopup();
-      map.panTo(pin.coords);
-    }
-  }
-
-  function changeFloorImage(imgId) {
-    const imgContents = document.getElementsByClassName('floor-img-content');
-    for (let img of imgContents) { img.style.display = 'none'; }
-    const targetImg = document.getElementById(imgId);
-    if (targetImg) {
-      // Inline block だとセンタリングされつつ最大幅が適用される
-      targetImg.style.display = (imgId === 'all_img') ? 'block' : 'inline-block';
-    }
-  }
-
+  // ★「全エリア」ではピンを消し、フロアが選択された時のみ該当ピンを表示する
   function showFloorPins(floorId) {
     markerGroup.clearLayers();
     leafletMarkers = {}; 
 
+    // 「全エリア」選択時はマップ上のピンをゼロにする
+    if (floorId === 'all') {
+      map.panTo(defaultCoords);
+      return;
+    }
+
     pinData.forEach(function(pin) {
-      if (floorId === 'all' || pin.floor === floorId) {
+      if (pin.floor === floorId) {
         const marker = L.marker(pin.coords);
-        // マップ上のポップアップの文字サイズも +5pt
         marker.bindPopup(`<b style="font-size: 18px;">${pin.name}</b><br><span style="font-size:17px; color:#555; line-height: 1.4; display: inline-block; margin-top: 5px;">${pin.desc}</span>`);
         
         marker.on('click', function() {
@@ -307,6 +260,56 @@
       map.panTo([35.54394, 139.44111]);
     } else {
       map.panTo(defaultCoords);
+    }
+  }
+
+  // ★個別のエリアが選択された時：該当する1つのピンのみを表示・ポップアップ表示する
+  function triggerPinSelection(pin) {
+    changeFloorImage(pin.img);
+    highlightImagePin(pin.id);
+
+    // 単一ピン表示処理
+    markerGroup.clearLayers();
+    leafletMarkers = {};
+
+    const marker = L.marker(pin.coords);
+    marker.bindPopup(`<b style="font-size: 18px;">${pin.name}</b><br><span style="font-size:17px; color:#555; line-height: 1.4; display: inline-block; margin-top: 5px;">${pin.desc}</span>`);
+    markerGroup.addLayer(marker);
+    leafletMarkers[pin.id] = marker;
+    
+    marker.openPopup();
+    map.panTo(pin.coords);
+
+    // 詳細情報表示
+    document.getElementById('info-title').innerText = pin.name;
+    let descHtml = `<p style="margin: 8px 0 12px 0; font-size: 18px; color: #555;">${pin.desc}</p>`;
+    
+    if (fetchedEvents[pin.name] && fetchedEvents[pin.name].length > 0) {
+      descHtml += `<div style="margin-top: 18px; border-top: 1px dashed #ccc; padding-top: 15px;">`;
+      descHtml += `<strong style="font-size: 20px; color: #2c3e50;">📋 出展・イベント一覧</strong>`;
+      descHtml += `<ul style="margin: 10px 0 0 0; padding-left: 24px; font-size: 19px; color: #333;">`;
+      
+      fetchedEvents[pin.name].forEach(ev => {
+        const genreBadge = ev.genre ? `<span style="font-size: 16px; color: #fff; background: #27ae60; padding: 3px 8px; border-radius: 12px; margin-left: 8px; vertical-align: middle;">${ev.genre}</span>` : '';
+        descHtml += `<li style="margin-bottom: 12px;">
+                       <b style="color:#d35400;">${ev.name || '名称不明'}</b> ${genreBadge}<br>
+                       <span style="color: #444; font-size: 18px;">${ev.content || ''}</span>
+                     </li>`;
+      });
+      descHtml += `</ul></div>`;
+    }
+
+    document.getElementById('info-desc').innerHTML = descHtml;
+    document.getElementById('floor-pin-info').style.display = 'block';
+    document.getElementById('area-select').value = pin.id;
+  }
+
+  function changeFloorImage(imgId) {
+    const imgContents = document.getElementsByClassName('floor-img-content');
+    for (let img of imgContents) { img.style.display = 'none'; }
+    const targetImg = document.getElementById(imgId);
+    if (targetImg) {
+      targetImg.style.display = (imgId === 'all_img') ? 'block' : 'inline-block';
     }
   }
 
@@ -353,7 +356,6 @@
     padding: 0 !important;
   }
 
-  /* ボタンの文字サイズも +5pt */
   .floor-btn {
     padding: 12px 22px;
     font-size: 20px;
