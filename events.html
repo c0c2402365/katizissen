@@ -5,28 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>イベント情報</title>
     <style>
+        /* 全体のフォントと背景色 */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 表を囲むカードデザイン */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        /* スマホ対応（横スクロール） */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 表のデザイン */
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px; /* 最低の横幅を確保 */
         }
+
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #e0e0e0;
         }
+
+        /* 見出し（ヘッダー）のデザイン */
         th {
-            background-color: #f2f2f2;
+            background-color: #3498db;
+            color: #ffffff;
+            font-weight: bold;
+            white-space: nowrap; /* 見出しの折り返しを防ぐ */
+        }
+
+        /* 偶数行の背景色（ストライプ） */
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* マウスオーバー時のエフェクト */
+        tr:hover {
+            background-color: #e8f4f8;
+            transition: background-color 0.2s ease;
+        }
+
+        /* 読み込み中メッセージ */
+        .status-message {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h1>イベント一覧</h1>
-    <!-- CSVのデータがこのdivタグの中にテーブルとして生成されます -->
-    <div id="csv-data-container">読み込み中...</div>
+    <div class="container">
+        <h1>イベント一覧</h1>
+        
+        <!-- 表が生成されるコンテナ -->
+        <div class="table-responsive" id="csv-data-container">
+            <div class="status-message">データを読み込み中...</div>
+        </div>
+    </div>
 
     <script>
-        // 読み込むCSVファイルのパスを指定します（実際のファイル名に合わせて変更してください）
+        // 読み込むCSVファイル名（必要に応じて変更してください）
         const csvFilePath = '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv';
 
         fetch(csvFilePath)
@@ -37,7 +100,7 @@
                 return response.text();
             })
             .then(csvText => {
-                // 改行コードで分割して行ごとの配列にする
+                // 行ごとに分割
                 const rows = csvText.split('\n');
                 let html = '<table>';
 
@@ -45,16 +108,18 @@
                     // 空行はスキップ
                     if (row.trim() === '') return;
                     
-                    // カンマで分割してカラムごとの配列にする
+                    // カンマで分割
                     const columns = row.split(',');
                     html += '<tr>';
                     
                     columns.forEach(column => {
-                        // 1行目は見出し（th）にする
+                        // 文字列の前後の空白や不要な記号を取り除く
+                        const text = column.trim().replace(/^"|"$/g, ''); 
+                        
                         if (index === 0) {
-                            html += `<th>${column.trim()}</th>`;
+                            html += `<th>${text}</th>`;
                         } else {
-                            html += `<td>${column.trim()}</td>`;
+                            html += `<td>${text}</td>`;
                         }
                     });
                     
@@ -63,12 +128,13 @@
 
                 html += '</table>';
                 
-                // HTMLに書き出す
+                // HTMLに適用
                 document.getElementById('csv-data-container').innerHTML = html;
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('csv-data-container').innerHTML = 'データを読み込めませんでした。';
+                document.getElementById('csv-data-container').innerHTML = 
+                    '<div class="status-message" style="color: #e74c3c;">CSVデータの読み込みに失敗しました。ローカルサーバーで起動しているか確認してください。</div>';
             });
     </script>
 
