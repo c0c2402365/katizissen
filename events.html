@@ -1,349 +1,76 @@
-<style>
-  /* 全体の見やすさ向上（モダンデザイン） */
-  .event-page-container {
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-    color: #333;
-    line-height: 1.6;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  /* 戻るボタン */
-  .back-link-container {
-    margin-bottom: 20px;
-  }
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    background: #f0f4f8;
-    color: #2c3e50;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: bold;
-    border: 1px solid #d0d7de;
-    transition: all 0.2s;
-  }
-  .back-btn:hover {
-    background: #e2e8f0;
-    color: #e67e22;
-  }
-
-  /* 検索ボックスのスタイリング */
-  .search-container {
-    background: #f8f9fa;
-    border: 1px solid #d0d7de;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  }
-  .search-container h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: #2c3e50;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .search-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  .search-group {
-    flex: 1;
-    min-width: 200px;
-  }
-  .search-group label {
-    display: block;
-    font-size: 14px;
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 6px;
-  }
-  .search-group select,
-  .search-group input {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    background-color: #fff;
-    transition: border-color 0.2s;
-  }
-  .search-group select:focus,
-  .search-group input:focus {
-    outline: none;
-    border-color: #27ae60;
-    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
-  }
-
-  /* テーブルの見やすさ向上 */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-bottom: 30px;
-  }
-  th {
-    background: #27ae60;
-    color: #ffffff;
-    padding: 14px 16px;
-    text-align: left;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  td {
-    padding: 14px 16px;
-    border-bottom: 1px solid #edf2f7;
-    vertical-align: middle;
-  }
-  tr:last-child td {
-    border-bottom: none;
-  }
-  tr:hover td {
-    background-color: #f0fdf4;
-  }
-  
-  /* レスポンシブ対応 */
-  .table-wrapper {
-    overflow-x: auto;
-    margin-bottom: 20px;
-  }
-  
-  /* メッセージ類 */
-  #no-results, #loading-msg {
-    text-align: center;
-    padding: 40px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    margin-bottom: 30px;
-  }
-  #no-results {
-    display: none;
-    background: #fff3f3;
-    color: #d63031;
-  }
-  #loading-msg {
-    background: #eef2f5;
-    color: #2c3e50;
-  }
-
-  .genre-badge {
-    display: inline-block;
-    background: #e67e22;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    margin: 2px;
-    font-weight: bold;
-  }
-</style>
-
-<div class="event-page-container">
-
-  <div class="back-link-container">
-    <a href="index.html" class="back-btn">
-      <span>⬅</span> マップ（トップページ）へ戻る
-    </a>
-  </div>
-
-  <h1 style="color: #2c3e50; border-bottom: 3px solid #27ae60; padding-bottom: 10px;">🎪 まちカフェ！2025 出展・イベント団体一覧</h1>
-  <p>2025年度に開催された「まちカフェ！」の出展団体およびイベントの一覧です。<br>
-  お目当てのブースやイベントを検索してチェックしてみましょう！</p>
-
-  <div class="search-container">
-    <h3>🔍 イベント・ブースを探す</h3>
-    <div class="search-filters">
-      <div class="search-group">
-        <label>🏢 エリアで絞り込む</label>
-        <select id="filter-area">
-          <option value="all">すべてのエリア</option>
-          </select>
-      </div>
-      <div class="search-group">
-        <label>🏷️ ジャンルで絞り込む</label>
-        <select id="filter-genre">
-          <option value="all">すべてのジャンル</option>
-          </select>
-      </div>
-      <div class="search-group">
-        <label>✏️ フリーワード検索</label>
-        <input type="text" id="filter-text" placeholder="団体名やキーワードを入力...">
-      </div>
-    </div>
-  </div>
-
-  <div id="loading-msg">スプレッドシートから最新データを読み込んでいます... ⏳</div>
-  
-  <div id="no-results">
-    該当するイベント・ブースが見つかりませんでした。<br>検索条件を変更してお試しください。
-  </div>
-
-  <div class="table-wrapper" id="table-container" style="display: none;">
-    <table id="event-table">
-      <thead>
-        <tr>
-          <th style="min-width: 140px;">出展エリア</th>
-          <th style="min-width: 180px;">団体・ブース名</th>
-          <th style="min-width: 250px;">出展・イベント内容</th>
-          <th style="min-width: 120px;">ジャンル</th>
-        </tr>
-      </thead>
-      <tbody id="event-tbody">
-        </tbody>
-    </table>
-  </div>
-
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-
-<script>
-  // ★★★ 管理者設定：ここにスプレッドシート（CSV）のURLを貼り付けてください ★★★
-  const csvUrl = '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv';
-
-  let allEvents = [];
-
-  document.addEventListener("DOMContentLoaded", function() {
-    loadCSVData();
-    
-    // フィルターの変更を監視
-    document.getElementById("filter-area").addEventListener("change", renderTable);
-    document.getElementById("filter-genre").addEventListener("change", renderTable);
-    document.getElementById("filter-text").addEventListener("input", renderTable);
-  });
-
-  // CSVデータの読み込み
-  function loadCSVData() {
-    if (csvUrl === '【フォーム1】第20回まちカフェ！参加申込書（回答）フォームの回答 1.csv' || csvUrl === '') {
-      document.getElementById('loading-msg').innerText = "エラー：CSVのURLが設定されていません。コード内の csvUrl を設定してください。";
-      return;
-    }
-
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        // 空の行を除外して保存
-        allEvents = results.data.filter(row => row['団体名'] && row['団体名'].trim() !== '');
-        
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('table-container').style.display = 'block';
-        
-        setupDynamicFilters();
-        renderTable();
-      },
-      error: function(err) {
-        console.error('CSVの読み込みに失敗しました:', err);
-        document.getElementById('loading-msg').innerText = "データの読み込みに失敗しました。URLが正しいか、公開設定になっているか確認してください。";
-      }
-    });
-  }
-
-  // 読み込んだデータから、エリアとジャンルの選択肢を自動生成する
-  function setupDynamicFilters() {
-    const areaSelect = document.getElementById("filter-area");
-    const genreSelect = document.getElementById("filter-genre");
-    
-    let uniqueAreas = new Set();
-    let uniqueGenres = new Set();
-
-    allEvents.forEach(ev => {
-      if (ev['出展エリア']) uniqueAreas.add(ev['出展エリア'].trim());
-      
-      if (ev['ジャンル']) {
-        // カンマ区切りのジャンルを分割して追加
-        const genres = ev['ジャンル'].split(/[、,]/);
-        genres.forEach(g => {
-          if (g.trim()) uniqueGenres.add(g.trim());
-        });
-      }
-    });
-
-    // エリアの選択肢を追加
-    Array.from(uniqueAreas).sort().forEach(area => {
-      const opt = document.createElement("option");
-      opt.value = area;
-      opt.textContent = area;
-      areaSelect.appendChild(opt);
-    });
-
-    // ジャンルの選択肢を追加
-    Array.from(uniqueGenres).sort().forEach(genre => {
-      const opt = document.createElement("option");
-      opt.value = genre;
-      opt.textContent = genre;
-      genreSelect.appendChild(opt);
-    });
-  }
-
-  // テーブルの描画と絞り込み
-  function renderTable() {
-    const tbody = document.getElementById("event-tbody");
-    const noResultsMsg = document.getElementById("no-results");
-    
-    // 検索条件の取得
-    const filterArea = document.getElementById("filter-area").value;
-    const filterGenre = document.getElementById("filter-genre").value;
-    const filterText = document.getElementById("filter-text").value.toLowerCase();
-
-    tbody.innerHTML = "";
-    let visibleCount = 0;
-
-    allEvents.forEach(ev => {
-      const area = (ev['出展エリア'] || "").trim();
-      const name = (ev['団体名'] || "").trim();
-      const content = (ev['出展内容'] || "").trim();
-      const genre = (ev['ジャンル'] || "").trim();
-
-      // 絞り込み判定
-      const matchArea = (filterArea === "all") || (area === filterArea);
-      const matchGenre = (filterGenre === "all") || (genre.includes(filterGenre));
-      const matchText = (filterText === "") || 
-                        (name.toLowerCase().includes(filterText) || 
-                         content.toLowerCase().includes(filterText) || 
-                         area.toLowerCase().includes(filterText));
-
-      if (matchArea && matchGenre && matchText) {
-        visibleCount++;
-        
-        const tr = document.createElement("tr");
-        
-        // ジャンルのバッジ（ラベル）化
-        let genreHtml = "";
-        if (genre) {
-          const genreArray = genre.split(/[、,]/);
-          genreArray.forEach(g => {
-            if(g.trim()) genreHtml += `<span class="genre-badge">${g.trim()}</span>`;
-          });
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>イベント情報</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
 
-        tr.innerHTML = `
-          <td><strong style="color: #2980b9;">${area}</strong></td>
-          <td style="font-weight: bold;">${name}</td>
-          <td>${content}</td>
-          <td>${genreHtml}</td>
-        `;
-        tbody.appendChild(tr);
-      }
-    });
+    <h1>イベント一覧</h1>
+    <!-- CSVのデータがこのdivタグの中にテーブルとして生成されます -->
+    <div id="csv-data-container">読み込み中...</div>
 
-    // 結果が0件の場合
-    if (visibleCount === 0) {
-      document.getElementById('table-container').style.display = 'none';
-      noResultsMsg.style.display = "block";
-    } else {
-      document.getElementById('table-container').style.display = 'block';
-      noResultsMsg.style.display = "none";
-    }
-  }
-</script>
+    <script>
+        // 読み込むCSVファイルのパスを指定します（実際のファイル名に合わせて変更してください）
+        const csvFilePath = '  1.csv';
+
+        fetch(csvFilePath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('CSVファイルの読み込みに失敗しました');
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                // 改行コードで分割して行ごとの配列にする
+                const rows = csvText.split('\n');
+                let html = '<table>';
+
+                rows.forEach((row, index) => {
+                    // 空行はスキップ
+                    if (row.trim() === '') return;
+                    
+                    // カンマで分割してカラムごとの配列にする
+                    const columns = row.split(',');
+                    html += '<tr>';
+                    
+                    columns.forEach(column => {
+                        // 1行目は見出し（th）にする
+                        if (index === 0) {
+                            html += `<th>${column.trim()}</th>`;
+                        } else {
+                            html += `<td>${column.trim()}</td>`;
+                        }
+                    });
+                    
+                    html += '</tr>';
+                });
+
+                html += '</table>';
+                
+                // HTMLに書き出す
+                document.getElementById('csv-data-container').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('csv-data-container').innerHTML = 'データを読み込めませんでした。';
+            });
+    </script>
+
+</body>
+</html>
