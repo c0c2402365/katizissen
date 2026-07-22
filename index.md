@@ -1,22 +1,36 @@
-<div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 14px 18px; border-radius: 8px; border: 1px solid #d0d7de; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-  <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">📍 会場マップナビゲーション</span>
-  <a href="events.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #27ae60; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+<style>
+  /* 画面幅いっぱいに広げるための設定と、Markdown全体のベース文字サイズ拡大 */
+  .markdown-body, .container, body {
+    max-width: 98% !important;
+    width: 100% !important;
+    margin: 0 auto;
+    font-size: 21px;
+    line-height: 1.7;
+  }
+  h2 { font-size: 29px !important; margin-top: 30px; }
+  h3 { font-size: 25px !important; }
+  li { font-size: 21px; margin-bottom: 8px; }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 18px 24px; border-radius: 8px; border: 1px solid #d0d7de; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+  <span style="font-size: 21px; font-weight: bold; color: #2c3e50;">📍 会場マップナビゲーション</span>
+  <a href="events.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #27ae60; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 21px; transition: background 0.2s;">
     <span>📅</span> イベントプログラム・出展一覧はこちら ➔
   </a>
 </div>
 
 ## 🗺️ 会場案内・フロアマップナビゲーション
 
-<p style="font-size: 16px; line-height: 1.6;">見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
+<p style="font-size: 21px; line-height: 1.6;">見たいエリア・階数を選択すると、アクセスマップとフロアマップ画像が自動で連動して切り替わります。</p>
 
-<div class="manual-nav-box" style="background: #f0f4f8; padding: 18px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d0d7de;">
-  <h4 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+<div class="manual-nav-box" style="background: #f0f4f8; padding: 22px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #d0d7de;">
+  <h4 style="margin: 0 0 16px 0; color: #2c3e50; font-size: 23px; display: flex; align-items: center; gap: 8px;">
     <span>🔍</span> フロア・エリアから直接探す
   </h4>
-  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 180px;">
-      <label style="font-size: 14px; color: #444; display: block; margin-bottom: 6px; font-weight: bold;">① フロアを選択</label>
-      <select id="floor-select" onchange="onFloorSelectChange(this.value)" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 16px;">
+  <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 250px;">
+      <label style="font-size: 19px; color: #444; display: block; margin-bottom: 8px; font-weight: bold;">① フロアを選択</label>
+      <select id="floor-select" onchange="onFloorSelectChange(this.value)" style="width: 100%; padding: 12px 16px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 21px;">
         <option value="all">全エリア表示</option>
         <option value="1f_out">1F 屋外マルシェ・広場</option>
         <option value="1f_in">1F 屋内（ワンストップ・みんなの広場）</option>
@@ -26,16 +40,16 @@
       </select>
     </div>
     
-    <div style="flex: 1; min-width: 220px;">
-      <label style="font-size: 14px; color: #444; display: block; margin-bottom: 6px; font-weight: bold;">② エリア・ブースを選択</label>
-      <select id="area-select" onchange="onAreaSelectChange(this.value)" style="width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 16px;" disabled>
+    <div style="flex: 1; min-width: 250px;">
+      <label style="font-size: 19px; color: #444; display: block; margin-bottom: 8px; font-weight: bold;">② エリア・ブースを選択</label>
+      <select id="area-select" onchange="onAreaSelectChange(this.value)" style="width: 100%; padding: 12px 16px; border-radius: 6px; border: 1px solid #ced4da; background: #fff; font-size: 21px;" disabled>
         <option value="">フロアを先に選択してください</option>
       </select>
     </div>
   </div>
 </div>
 
-<div class="map-controls" style="margin-bottom: 20px;">
+<div class="map-controls" style="margin-bottom: 25px;">
   <button class="floor-btn active" data-floor="all" onclick="switchFloorMap('all', 'all_img')">全エリア</button>
   <button class="floor-btn" data-floor="1f_out" onclick="switchFloorMap('1f_out', 'all_img')">1F 屋外</button>
   <button class="floor-btn" data-floor="1f_in" onclick="switchFloorMap('1f_in', 'floor1_img')">1F 屋内</button>
@@ -44,35 +58,36 @@
   <button class="floor-btn" data-floor="hall" onclick="switchFloorMap('hall', 'all_img')">市民ホール</button>
 </div>
 
-<div class="map-flex-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+<div class="map-flex-container" style="display: flex; flex-wrap: wrap; gap: 30px;">
   
-  <div class="map-block" style="flex: 1; min-width: 320px;">
-    <h3 style="margin-top: 0; font-size: 20px;">📍 アクセスマップ</h3>
-    <div id="event-map" style="width: 100%; height: 420px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
+  <div class="map-block" style="flex: 1; min-width: 400px;">
+    <h3 style="margin-top: 0; font-size: 25px;">📍 アクセスマップ</h3>
+    <div id="event-map" style="width: 100%; height: 600px; border-radius: 8px; border: 1px solid #ccc; z-index: 1;"></div>
   </div>
 
-  <div class="image-block" style="flex: 1; min-width: 320px; text-align: center;">
-    <h3 style="margin-top: 0; text-align: left; font-size: 20px;">🏢 庁舎内・会場レイアウト</h3>
+  <div class="image-block" style="flex: 1; min-width: 400px; text-align: center;">
+    <h3 style="margin-top: 0; text-align: left; font-size: 25px;">🏢 庁舎内・会場レイアウト</h3>
     
-    <div id="all_img" class="floor-img-content" style="display: block; padding: 60px 20px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 8px;">
-      <p style="color: #555; margin: 0; font-size: 16px; line-height: 1.6;">
+    <div id="all_img" class="floor-img-content" style="display: block; padding: 80px 30px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 8px;">
+      <p style="color: #555; margin: 0; font-size: 21px; line-height: 1.6;">
         上の選択メニューまたはボタンから<b>「1F屋内」「2F」「3F」</b>を選択すると、<br>
         ここに詳細なフロアマップ（画像）が表示されます。<br><br>
         地図や画像のピンからも連動して確認できます！
       </p>
     </div>
 
-    <div id="floor1_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
+    <!-- 画像の最大幅を画面いっぱいに広がるように 100% に変更 -->
+    <div id="floor1_img" class="floor-img-content" style="display: none; position: relative; max-width: 100%; width: 100%;">
       <img src="1F.jpeg" alt="町田市役所 1階フロアマップ" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
       <div class="inner-pins"></div>
     </div>
     
-    <div id="floor2_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
+    <div id="floor2_img" class="floor-img-content" style="display: none; position: relative; max-width: 100%; width: 100%;">
       <img src="2F_floor1.jpg" alt="町田市役所 2階フロアマップ" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
       <div class="inner-pins"></div>
     </div>
     
-    <div id="floor3_img" class="floor-img-content" style="display: none; position: relative; display: inline-block; max-width: 450px; width: 100%;">
+    <div id="floor3_img" class="floor-img-content" style="display: none; position: relative; max-width: 100%; width: 100%;">
       <img src="FloorMAP3F.jpg" alt="町田市役所 3階フロアマップ" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block;">
       <div class="inner-pins"></div>
     </div>
@@ -80,9 +95,9 @@
 
 </div>
 
-<div id="floor-pin-info" style="margin-top: 20px; padding: 15px 18px; background: #fffcf5; border-left: 5px solid #e67e22; border-radius: 6px; display: none;">
-  <strong id="info-title" style="color: #d35400; font-size: 18px; display: block;"></strong>
-  <div id="info-desc" style="margin: 8px 0 0 0; font-size: 14px; color: #333; line-height: 1.6;"></div>
+<div id="floor-pin-info" style="margin-top: 25px; padding: 20px 24px; background: #fffcf5; border-left: 6px solid #e67e22; border-radius: 6px; display: none;">
+  <strong id="info-title" style="color: #d35400; font-size: 23px; display: block;"></strong>
+  <div id="info-desc" style="margin: 10px 0 0 0; font-size: 19px; color: #333; line-height: 1.6;"></div>
 </div>
 
 
@@ -98,7 +113,7 @@
   let map;
   let markerGroup;
   let leafletMarkers = {}; 
-  let fetchedEvents = {}; // スプレッドシートから読み込んだデータを格納
+  let fetchedEvents = {}; 
 
   const floorImgMap = {
     'all': 'all_img',
@@ -135,11 +150,9 @@
     showFloorPins('all');
     renderImagePins();
     
-    // スプレッドシート（CSV）の読み込みを実行
     loadCSVData();
   });
 
-  // ▼ PapaParseを使ってスプレッドシート（CSV）を読み込む
   function loadCSVData() {
     if (csvUrl === 'ここに取得したCSVのURLを貼り付けてください' || csvUrl === '') {
       console.log('CSVのURLがまだ設定されていません。固定データを表示します。');
@@ -224,33 +237,30 @@
     }
   }
 
-  // ▼ ピンが選択されたときに、CSVのデータを使って詳細情報を生成する
   function triggerPinSelection(pin) {
     changeFloorImage(pin.img);
     highlightImagePin(pin.id);
 
-    // エリア名を表示
     document.getElementById('info-title').innerText = pin.name;
     
-    // 基本説明テキスト（固定データ）
-    let descHtml = `<p style="margin: 5px 0 10px 0; font-size: 13px; color: #555;">${pin.desc}</p>`;
+    // 説明文の文字サイズも +5pt
+    let descHtml = `<p style="margin: 8px 0 12px 0; font-size: 18px; color: #555;">${pin.desc}</p>`;
     
-    // スプレッドシートから読み込んだ出展団体リストがあれば追記
     if (fetchedEvents[pin.name] && fetchedEvents[pin.name].length > 0) {
-      descHtml += `<div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 12px;">`;
-      descHtml += `<strong style="font-size: 15px; color: #2c3e50;">📋 出展・イベント一覧</strong>`;
-      descHtml += `<ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 14px; color: #333;">`;
+      descHtml += `<div style="margin-top: 18px; border-top: 1px dashed #ccc; padding-top: 15px;">`;
+      descHtml += `<strong style="font-size: 20px; color: #2c3e50;">📋 出展・イベント一覧</strong>`;
+      descHtml += `<ul style="margin: 10px 0 0 0; padding-left: 24px; font-size: 19px; color: #333;">`;
       
       fetchedEvents[pin.name].forEach(ev => {
-        const genreBadge = ev.genre ? `<span style="font-size: 11px; color: #fff; background: #27ae60; padding: 2px 6px; border-radius: 10px; margin-left: 6px; vertical-align: middle;">${ev.genre}</span>` : '';
-        descHtml += `<li style="margin-bottom: 10px;">
+        const genreBadge = ev.genre ? `<span style="font-size: 16px; color: #fff; background: #27ae60; padding: 3px 8px; border-radius: 12px; margin-left: 8px; vertical-align: middle;">${ev.genre}</span>` : '';
+        descHtml += `<li style="margin-bottom: 12px;">
                        <b style="color:#d35400;">${ev.name || '名称不明'}</b> ${genreBadge}<br>
-                       <span style="color: #444; font-size: 13px;">${ev.content || ''}</span>
+                       <span style="color: #444; font-size: 18px;">${ev.content || ''}</span>
                      </li>`;
       });
       descHtml += `</ul></div>`;
     } else if (csvUrl !== '【フォーム1】第20回まちカフェ！参加申込書（回答）.xlsx - フォームの回答 1.csv') {
-      descHtml += `<div style="margin-top: 10px; font-size: 13px; color: #888;">（現在このエリアの出展情報はありません）</div>`;
+      descHtml += `<div style="margin-top: 12px; font-size: 18px; color: #888;">（現在このエリアの出展情報はありません）</div>`;
     }
 
     document.getElementById('info-desc').innerHTML = descHtml;
@@ -269,6 +279,7 @@
     for (let img of imgContents) { img.style.display = 'none'; }
     const targetImg = document.getElementById(imgId);
     if (targetImg) {
+      // Inline block だとセンタリングされつつ最大幅が適用される
       targetImg.style.display = (imgId === 'all_img') ? 'block' : 'inline-block';
     }
   }
@@ -280,7 +291,8 @@
     pinData.forEach(function(pin) {
       if (floorId === 'all' || pin.floor === floorId) {
         const marker = L.marker(pin.coords);
-        marker.bindPopup(`<b style="font-size: 13px;">${pin.name}</b><br><span style="font-size:12px; color:#555; line-height: 1.4; display: inline-block; margin-top: 4px;">${pin.desc}</span>`);
+        // マップ上のポップアップの文字サイズも +5pt
+        marker.bindPopup(`<b style="font-size: 18px;">${pin.name}</b><br><span style="font-size:17px; color:#555; line-height: 1.4; display: inline-block; margin-top: 5px;">${pin.desc}</span>`);
         
         marker.on('click', function() {
           triggerPinSelection(pin);
@@ -341,15 +353,16 @@
     padding: 0 !important;
   }
 
+  /* ボタンの文字サイズも +5pt */
   .floor-btn {
-    padding: 10px 18px;
-    font-size: 15px;
+    padding: 12px 22px;
+    font-size: 20px;
     font-weight: 500;
     cursor: pointer;
     background: #f7f9fa;
     border: 1px solid #ced4da;
     border-radius: 20px;
-    margin: 4px;
+    margin: 6px;
     transition: all 0.2s;
   }
   .floor-btn.active {
@@ -364,8 +377,8 @@
 
   .floor-image-pin {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     background-color: rgba(255, 59, 48, 0.85);
     border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 50%;
