@@ -107,11 +107,31 @@
 <script>
   const csvUrl = 'ここに取得したCSVのURLを貼り付けてください';
 
-  const defaultCoords = [35.545199, 139.442838];
+  // 町田市役所 本庁舎の中央座標
+  const defaultCoords = [35.54530, 139.44280];
   let map;
   let markerGroup;
   let leafletMarkers = {}; 
   let fetchedEvents = {}; 
+
+  // 正確にズレなくピンを立てるためのカスタムLeafletピンアイコン定義
+  const createCustomIcon = () => {
+    return L.divIcon({
+      className: 'leaflet-custom-marker',
+      html: `<div style="
+        width: 30px;
+        height: 30px;
+        background: #e67e22;
+        border: 2px solid #ffffff;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      "></div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 30], // 針先の中心位置（下部中央）
+      popupAnchor: [0, -32]
+    });
+  };
 
   const floorImgMap = {
     'all': 'all_img',
@@ -122,22 +142,23 @@
     'hall': 'all_img'
   };
 
+  // 町田市役所敷地・庁舎内の正確な座標情報
   const pinData = [
-    { id: 1, floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54535, 139.44265], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！', mapPos: null },
-    { id: 2, floor: '1f_out', img: 'all_img', name: '1F 屋外こもれび広場', coords: [35.54540, 139.44285], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。', mapPos: null },
-    { id: 3, floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54515, 139.44275], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。', mapPos: { top: '70%', left: '78%' } },
-    { id: 4, floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54510, 139.44295], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。', mapPos: { top: '48%', left: '48%' } },
-    { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54522, 139.44290], desc: '【2階下側】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '80%', left: '47%' } },
-    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54525, 139.44305], desc: '【2階右上・208-210エリア】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '30%', left: '73%' } },
-    { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54530, 139.44298], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '50%', left: '30%' } },
-    { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54505, 139.44270], desc: '【3階上側・302号室周辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '16%', left: '67%' } },
-    { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54498, 139.44285], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '61%', left: '44%' } },
-    { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54500, 139.44300], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '45%', left: '82%' } },
-    { id: 11, floor: 'hall',  img: 'all_img', name: '町田市民ホール', coords: [35.54394, 139.44111], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！', mapPos: null }
+    { id: 1, floor: '1f_out', img: 'all_img', name: '1F 屋外マルシェ', coords: [35.54515, 139.44245], desc: '【正面入口前・屋外】新鮮野菜販売、草木染め、各NPOの物販・体験など多数出展！', mapPos: null },
+    { id: 2, floor: '1f_out', img: 'all_img', name: '1F 屋外こもれび広場', coords: [35.54560, 139.44275], desc: '【北側・屋外】法政大学焼きそば屋台、各種キッチンカー、リフトカー体験など。', mapPos: null },
+    { id: 3, floor: '1f_in',  img: 'floor1_img', name: '1F みんなの広場', coords: [35.54520, 139.44270], desc: '【1階右下エリア】認知症悩みごと相談、古本リサイクル、遺産・相続無料相談会など。', mapPos: { top: '70%', left: '78%' } },
+    { id: 4, floor: '1f_in',  img: 'floor1_img', name: '1F ワンストップロビー', coords: [35.54530, 139.44285], desc: '【1階中央（案内所・エレベーター周辺）】謎解きスタンプラリー、ボッチャ体験、防災クイズなど。', mapPos: { top: '48%', left: '48%' } },
+    { id: 5, floor: '2f',     img: 'floor2_img', name: '2F 市民協働おうえんルーム', coords: [35.54525, 139.44280], desc: '【2階下側】助産師相談、陽だまりカフェ、スマホ相談、脳疲労ケア体験など。', mapPos: { top: '80%', left: '47%' } },
+    { id: 6, floor: '2f',     img: 'floor2_img', name: '2F 北側廊下・キッズスペース・東側廊下', coords: [35.54545, 139.44295], desc: '【2階右上・208-210エリア】ミニまちだ駄菓子屋、おしごとなりきり、クリスマスオーナメント工作、里親制度案内など。', mapPos: { top: '30%', left: '73%' } },
+    { id: 7, floor: '2f',     img: 'floor2_img', name: '2F 会議室（2-1 〜 2-4）', coords: [35.54535, 139.44265], desc: '【2階左側・赤色202-204エリア】マッサージ体験、点字、iPhone教室、マイクラ農体験、演劇WS。', mapPos: { top: '50%', left: '30%' } },
+    { id: 8, floor: '3f',     img: 'floor3_img', name: '3F 会議室（3-1 〜 3-3）', coords: [35.54540, 139.44270], desc: '【3階上側・302号室周辺】エンディングウェア発表会、ブラックライトアート空間、ひなた村出張科学クラブなど。', mapPos: { top: '16%', left: '67%' } },
+    { id: 9, floor: '3f',     img: 'floor3_img', name: '3F アトリウム', coords: [35.54528, 139.44282], desc: '【3階中央大きな広場】革小物WS、リス園写真展示、手話サークル、やさしい日本語クイズ、無料相談。', mapPos: { top: '61%', left: '44%' } },
+    { id: 10, floor: '3f',    img: 'floor3_img', name: '3F 議場', coords: [35.54525, 139.44305], desc: '【3階右側・議場】10:15〜 いのちの授業、13:30〜 マチーダ楽団ラテンジャズ（※要予約）。', mapPos: { top: '45%', left: '82%' } },
+    { id: 11, floor: 'hall',  img: 'all_img', name: '町田市民ホール', coords: [35.54395, 139.44112], desc: '【市役所から西へ徒歩3分】会議室1〜5にて、ヨガ、ナリワイ大集合、絵本読み聞かせ、盆おどりなど開催！', mapPos: null }
   ];
 
   document.addEventListener("DOMContentLoaded", function() {
-    map = L.map('event-map').setView(defaultCoords, 17);
+    map = L.map('event-map').setView(defaultCoords, 18);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -145,7 +166,7 @@
     }).addTo(map);
 
     markerGroup = L.layerGroup().addTo(map);
-    showFloorPins('all'); // 初期状態はピン非表示
+    showFloorPins('all');
     renderImagePins();
     
     loadCSVData();
@@ -231,12 +252,10 @@
     }
   }
 
-  // ★「全エリア」ではピンを消し、フロアが選択された時のみ該当ピンを表示する
   function showFloorPins(floorId) {
     markerGroup.clearLayers();
     leafletMarkers = {}; 
 
-    // 「全エリア」選択時はマップ上のピンをゼロにする
     if (floorId === 'all') {
       map.panTo(defaultCoords);
       return;
@@ -244,7 +263,7 @@
 
     pinData.forEach(function(pin) {
       if (pin.floor === floorId) {
-        const marker = L.marker(pin.coords);
+        const marker = L.marker(pin.coords, { icon: createCustomIcon() });
         marker.bindPopup(`<b style="font-size: 18px;">${pin.name}</b><br><span style="font-size:17px; color:#555; line-height: 1.4; display: inline-block; margin-top: 5px;">${pin.desc}</span>`);
         
         marker.on('click', function() {
@@ -257,22 +276,20 @@
     });
 
     if (floorId === 'hall') {
-      map.panTo([35.54394, 139.44111]);
+      map.panTo([35.54395, 139.44112]);
     } else {
       map.panTo(defaultCoords);
     }
   }
 
-  // ★個別のエリアが選択された時：該当する1つのピンのみを表示・ポップアップ表示する
   function triggerPinSelection(pin) {
     changeFloorImage(pin.img);
     highlightImagePin(pin.id);
 
-    // 単一ピン表示処理
     markerGroup.clearLayers();
     leafletMarkers = {};
 
-    const marker = L.marker(pin.coords);
+    const marker = L.marker(pin.coords, { icon: createCustomIcon() });
     marker.bindPopup(`<b style="font-size: 18px;">${pin.name}</b><br><span style="font-size:17px; color:#555; line-height: 1.4; display: inline-block; margin-top: 5px;">${pin.desc}</span>`);
     markerGroup.addLayer(marker);
     leafletMarkers[pin.id] = marker;
@@ -280,7 +297,6 @@
     marker.openPopup();
     map.panTo(pin.coords);
 
-    // 詳細情報表示
     document.getElementById('info-title').innerText = pin.name;
     let descHtml = `<p style="margin: 8px 0 12px 0; font-size: 18px; color: #555;">${pin.desc}</p>`;
     
@@ -348,12 +364,9 @@
 </script>
 
 <style>
-  .leaflet-marker-icon,
-  .leaflet-marker-shadow {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
+  .leaflet-custom-marker {
+    background: transparent;
+    border: none;
   }
 
   .floor-btn {
